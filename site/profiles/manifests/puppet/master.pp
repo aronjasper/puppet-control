@@ -81,13 +81,11 @@ class profiles::puppet::master (
       require  => Package [ $build_dependencies, 'rubygems','ruby-devel']
     }
 
-
-    # Copy standard puppet rack config
     file { '/etc/puppet/config.ru' :
       ensure  => present,
       owner   => 'puppet',
       group   => 'puppet',
-      source  => '/usr/share/puppet/ext/rack/config.ru',
+      source  => 'puppet:///modules/profiles/puppet_rack_config.ru',
       require => Package ['puppet-server']
     }
 
@@ -112,9 +110,19 @@ class profiles::puppet::master (
       owner   => root,
       group   => root,
       mode    => '0600',
+      require => Service ['puppetmaster-unicorn'],
       notify  => Service['nginx']
     }
 
+    # Ensure old puppet service is stopped
+    exec { 'stop-puppetmaster' :
+      command => '/usr/sbin/service puppetmaster stop',
+      onlyif  => '/usr/sbin/service puppetmaster status'
+    }->
+    # Remove old puppetmaster service from systemd
+    file { '/usr/lib/systemd/system/puppetmaster.service' :
+      ensure  => absent,
+    }->
     # Configure systemd to start puppet unicorn service
     file { '/etc/systemd/system/puppetmaster-unicorn.service' :
       ensure  => present,
@@ -123,18 +131,40 @@ class profiles::puppet::master (
       source  => 'puppet:///modules/profiles/puppetmaster-unicorn.service',
       notify  => Exec ['systemctl daemon-reload'],
       require => Package ['unicorn','rack']
-    }
-
-    # Reload systemd to pick up config change
+    }->
+    # Reload systemd to pick up config changexs
     exec {'systemctl daemon-reload' :
       command     => '/usr/bin/systemctl daemon-reload',
       refreshonly => true
-    }
-
+    }->
     # Start puppet master service
     service { 'puppetmaster-unicorn' :
       ensure  => running,
+      enable  => true,
       require => File ['/etc/systemd/system/puppetmaster-unicorn.service']
+    }
+
+    # Check that puppe-master cert file has been written
+    exec {'check_presence':
+      command => '/bin/true',
+      onlyif  => '/usr/bin/test -e /var/lib/puppet/ssl/certs/puppet-master.dev.ctp.local.pem',
+    }
+
+    # puppetlabs/puppetdb
+    class { '::puppetdb':
+      listen_address     => '0.0.0.0',
+      ssl_set_cert_paths => true,
+      ssl_cert_path      => "/var/lib/puppet/ssl/certs/${::fqdn}.pem",
+      ssl_key_path       => "/var/lib/puppet/ssl/private_keys/${::fqdn}.pem",
+      ssl_ca_cert_path   => '/var/lib/puppet/ssl/certs/ca.pem',
+      require             => Exec ['check_presence']
+    }
+
+    class { 'puppetdb::master::config':
+      puppetdb_server     => $::fqdn,
+      puppetdb_port       => 8081,
+      puppet_service_name => 'puppetmaster-unicorn.service',
+      require             => Exec ['check_presence']
     }
 
     # zack/r10k
@@ -151,22 +181,6 @@ class profiles::puppet::master (
         }
       }
     }
-
-    # puppetlabs/puppetdb
-    class { '::puppetdb':
-      listen_address     => '0.0.0.0',
-      ssl_set_cert_paths => true,
-      ssl_cert_path      => "/var/lib/puppet/ssl/certs/${::fqdn}.pem",
-      ssl_key_path       => "/var/lib/puppet/ssl/private_keys/${::fqdn}.pem",
-      ssl_ca_cert_path   => '/var/lib/puppet/ssl/certs/ca.pem',
-      require            => Service ['puppetmaster-unicorn']
-    }
-
-    class { 'puppetdb::master::config':
-      puppetdb_server => $::fqdn,
-      puppetdb_port   => 8081
-    }
-
     # Ensure puppetdb user is in the puppet group to allow access to certs
     user { 'puppetdb' :
       groups => puppet
