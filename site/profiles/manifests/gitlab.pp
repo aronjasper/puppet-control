@@ -29,7 +29,8 @@ class profiles::gitlab (
   $ldap_bind_dn     = 'undef',
   $ldap_password    = 'undef',
   $aws_acccess_key  = undef,
-  $aws_secret_key   = undef
+  $aws_secret_key   = undef,
+  $backup_method    = undef
 
 ){
 
@@ -101,7 +102,7 @@ class profiles::gitlab (
     }
 
     #Set up s3 backups if on AWS
-    if $::hosting_platform == AWS {
+    if $backup_method == 's3' {
 
       package { 's3cmd':
         ensure => present,
@@ -116,7 +117,7 @@ class profiles::gitlab (
     }
 
     #Set up nfs mount for internal backups
-    if $::hosting_platform == 'internal' {
+    if $backup_method == 'nfs' {
 
       package { 'nfs-utils' :
         ensure => present
