@@ -27,6 +27,7 @@ class profiles::pulp(
   }
   class { '::pulp::login':
     username => $pulp::admin::username,
+    password => $pulp::admin::password,
     stage    => 'pulp-login',
   }
   class { '::pulp::admin_update':
