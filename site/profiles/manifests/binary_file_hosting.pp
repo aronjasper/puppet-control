@@ -4,8 +4,6 @@ class profiles::binary_file_hosting (
   $file_dir    = '/srv/file_hosting/files',
   $listen_port = 8085,
   ) {
-  class { 'nginx':
-  }
 
   file { $root_dir:
     ensure  => directory,
@@ -23,6 +21,7 @@ class profiles::binary_file_hosting (
     www_root    => $root_dir,
     server_name => ['binary_file_hosting'],
     autoindex   => 'on',
+    require     => Class['nginx'],
   }
 
   selinux::module { 'nginx_unreservedport':
