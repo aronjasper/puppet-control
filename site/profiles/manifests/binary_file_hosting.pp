@@ -1,7 +1,7 @@
 class profiles::binary_file_hosting (
 
-  $root_dir    = '/opt/file_hosting/',
-  $file_dir    = '/opt/file_hosting/files',
+  $root_dir    = '/srv/file_hosting/',
+  $file_dir    = '/srv/file_hosting/files',
   $listen_port = 8085,
   ) {
   class { 'nginx':
