@@ -8,12 +8,12 @@ class profiles::binary_file_hosting (
   }
 
   file { $root_dir:
-    ensure => directory,
+    ensure  => directory,
     recurse => true,
   }
 
   file { $file_dir:
-    ensure => directory,
+    ensure  => directory,
     recurse => true,
   }
 
