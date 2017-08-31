@@ -21,6 +21,7 @@ class profiles::jenkins (
 
   $plugins                 = hiera_hash('jenkins_plugins', false),
   $jobs                    = undef,
+  $repo                    = undef,
   $deploy_from_jenkins_rsa = undef,
   $version                 = '1.651-1.1',
   $phantomjs_version       = '1.9.8',
@@ -107,6 +108,7 @@ class profiles::jenkins (
     configure_firewall => false,
     job_hash           => $jobs,
     version            => $version,
+    repo               => hiera('jenkins_manage_repo', true),
   }
 
   file { '/var/lib/jenkins/.ssh':
