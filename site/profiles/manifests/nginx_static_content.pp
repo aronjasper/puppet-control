@@ -57,7 +57,7 @@ class profiles::nginx_static_content (
   create_resources('wget::fetch', $download_files, $download_files_defaults)
 
   exec { 'update_files_ownership':
-    command     => "/bin/chown -R ${owner}:${group} ${root_dir}",
+    command     => "/bin/chown -R ${owner}:${group} ${root_dir}; /bin/chmod -R 0755 ${root_dir}",
     refreshonly => true
   }
 }
