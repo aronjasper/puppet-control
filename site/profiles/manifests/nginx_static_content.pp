@@ -1,16 +1,20 @@
 class profiles::nginx_static_content (
-  $root_dir    = '/srv/www/',
-  $file_dir    = '/srv/www/llc-files',
-  $listen_port = '8085',
-  $server_name = 'static_content',
+  $listen_port    = '8085',
+  $server_name    = 'static_content',
+  $root_dir       = '/srv/www/',
+  $file_dir       = '/srv/www/llc-files',
+  $owner          = 'root',
+  $group          = 'nginx',
+  $download_files = {},
 ) {
 
   include ::nginx
+  include ::wget
 
   file { $root_dir:
     ensure  => directory,
-    owner   => 'root',
-    group   => 'nginx',
+    owner   => $owner,
+    group   => $group,
     mode    => '0755',
     recurse => true,
     require => Package['nginx'],
@@ -18,8 +22,8 @@ class profiles::nginx_static_content (
 
   file { $file_dir:
     ensure  => directory,
-    owner   => 'root',
-    group   => 'nginx',
+    owner   => $owner,
+    group   => $group,
     mode    => '0755',
     recurse => true,
     require => Package['nginx'],
@@ -42,5 +46,18 @@ class profiles::nginx_static_content (
   selinux::module { 'nginx_files_hosting':
     ensure => 'present',
     source => 'puppet:///modules/profiles/nginx_files_hosting.te'
+  }
+
+  $download_files_defaults = {
+    mode    => '0755',
+    require => File[$file_dir],
+    notify  => Exec['update_files_ownership']
+  }
+
+  create_resources('wget::fetch', $download_files, $download_files_defaults)
+
+  exec { 'update_files_ownership':
+    command     => "/bin/chown -R $owner:$group $root_dir",
+    refreshonly => true
   }
 }
