@@ -21,7 +21,7 @@ class profiles::nginx_static_content (
     group   => 'nginx',
     mode    => '0755',
     recurse => true,
-    require => Package['nginx'],  
+    require => Package['nginx'],
   }
 
   nginx::resource::vhost { 'static_content':
