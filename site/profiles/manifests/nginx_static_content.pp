@@ -2,7 +2,7 @@ class profiles::nginx_static_content (
   $listen_port    = '8085',
   $server_name    = 'static_content',
   $root_dir       = '/srv/www/',
-  $file_dir       = '/srv/www/llc-files',
+  $file_dir       = '/srv/www/files',
   $owner          = 'root',
   $group          = 'nginx',
   $download_files = {},
