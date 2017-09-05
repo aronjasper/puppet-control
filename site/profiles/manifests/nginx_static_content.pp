@@ -2,6 +2,7 @@ class profiles::nginx_static_content (
   $root_dir    = '/srv/www/',
   $file_dir    = '/srv/www/llc-files',
   $listen_port = '8085',
+  $server_name = 'static_content',
 ) {
 
   include ::nginx
@@ -28,7 +29,7 @@ class profiles::nginx_static_content (
     ensure      => present,
     listen_port => $listen_port,
     www_root    => $root_dir,
-    server_name => ['static_content'],
+    server_name => [$server_name],
     autoindex   => 'on',
     require     => File[$file_dir]
   }
