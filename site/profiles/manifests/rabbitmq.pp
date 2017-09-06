@@ -33,6 +33,7 @@ class profiles::rabbitmq(
   $rabbitmq_vhosts           = hiera_hash('rabbitmq_vhosts', false),
   $rabbitmq_policy           = hiera_hash('rabbitmq_policy', false),
   $time_period               = hiera('nagios_time_period', '24x7'),
+  $package_source            = undef,
   $rabbitmq_key              = undef,
   $package_gpg_key           = undef,
 ){
@@ -49,13 +50,18 @@ class profiles::rabbitmq(
   class { 'erlang': epel_enable => $erlang_epel_enable }
   include ::erlang
 
+  $real_source = $package_source ? {
+    undef   => "https://www.rabbitmq.com/releases/rabbitmq-server/v${version}/rabbitmq-server-${version}-1.noarch.rpm",
+    default => $package_source
+  }
+
   # Install rabbit direct from rabbit (if not epel version)
   if $version != '3.3.5' {
     package { "rabbitmq-server-${version}-1.noarch" :
       ensure   => 'installed',
       provider => 'rpm',
-      source   => "https://www.rabbitmq.com/releases/rabbitmq-server/v${version}/rabbitmq-server-${version}-1.noarch.rpm",
-      require  => Class[erlang]
+      source   => $real_source,
+      require  => Class[erlang],
     }
     notify { "rabbit-server package version ${version} installed direct from rabbit":}
   } else {
