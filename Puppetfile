@@ -76,7 +76,7 @@ mod 'puppet-openresty',                :git => 'https://github.com/LandRegistry-
 mod 'landregistry/static_content',     :git => 'https://github.com/LandRegistry/puppet-openresty-static-content.git',
                                        :ref => '221f73755a052b780dd9f98ca14c82e09571cbd6'
 mod 'puppet-geoserver',                :git => 'https://github.com/LandRegistry-Ops/puppet-geoserver.git',
-                                       :ref => '3045ad234315f4bc826e130db6b1433fdf52836b'
+                                       :ref => '9f4cff7c6388beb56884ef641181960424e1a596'
 mod 'attachmentgenie/mailhog',         '1.0.0'
 mod 'puppet-redis',                    :git => 'https://github.com/LandRegistry-Ops/puppet-redis.git',
                                        :ref => 'v3.2.1'
