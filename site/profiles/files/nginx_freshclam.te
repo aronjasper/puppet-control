@@ -1,0 +1,13 @@
+
+module nginx_freshclam 1.0;
+
+require {
+	type user_tmp_t;
+	type httpd_t;
+	class file open;
+}
+
+#============= httpd_t ==============
+
+#!!!! This avc can be allowed using the boolean 'httpd_read_user_content'
+allow httpd_t user_tmp_t:file open;

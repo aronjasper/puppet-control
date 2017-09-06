@@ -7,7 +7,7 @@ class profiles::python_rpm_build_tools () {
   package {
 
   'virtualenv':
-    ensure   => latest,
+    ensure   => present,
     provider => 'pip3';
 
   'virtualenv-tools':

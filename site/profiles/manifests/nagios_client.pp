@@ -37,11 +37,31 @@
 
 class profiles::nagios_client(
 
-  $interface       = eth1,
-  $nagios_services = hiera_hash('nagios_services', false),
-  $time_period     = hiera('nagios_time_period', '24x7')
+  $interface         = eth1,
+  $nagios_services   = hiera_hash('nagios_services', false),
+  $time_period       = hiera('nagios_time_period', '24x7'),
+  $contacts          = hiera_hash('nagios_contacts', false)
 
   ){
+
+  $hostgroups = ["network_location_${::network_location}",$::application_environment,"puppet_${::puppet_environment}","service_${::service}"]
+
+  # Check that host groups are configured on server (nagios server will fail to
+  # start if a client adds itself to a host group that does not exist)
+  define validate_hostgroups(
+
+    $server_hostgroups = hiera_hash('nagios_hostgroups',{ network_location_zone1 => {},
+                                                          development            => {},
+                                                          puppet_local           => {},
+                                                          service_test           => {}
+                                                        }),
+    ){
+    if ! has_key($server_hostgroups, $name){
+      fail ("hostgroup ${name} is not configured on the nagios server")
+    }
+  }
+
+  validate_hostgroups { $hostgroups:}
 
   # create additional nrpe commands from hiera
   class { 'nagiosclient':
@@ -60,7 +80,8 @@ class profiles::nagios_client(
     check_period          => $time_period,
     notification_interval => '0',
     notification_period   => $time_period,
-    contact_groups        => 'admins'
+    contact_groups        =>"${::service},${::application_environment}",
+    hostgroups            => join($hostgroups,',')
   }
 
   # Export nagios service configuration
@@ -135,7 +156,8 @@ class profiles::nagios_client(
   }
 
   # Only add swap check if this is not an aws machine
-  if ($::hosting_platform != dev_aws) and ($::hosting_platform != internal_aws) {
+  if ($::hosting_platform != dev_aws) and ($::hosting_platform != internal_aws)
+      and ($::hosting_platform != nfr_aws) {
     @@nagios_service { "check_swap_${::hostname}":
       ensure                => present,
       check_command         => 'check_nrpe!check_swap\!20\!10',

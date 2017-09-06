@@ -17,6 +17,7 @@ class profiles::application (
     $app_type = 'wsgi',
     $notification_period = undef,
     $check_period = undef,
+    $healthcheck = undef,
 
     ){
     if ($app_type in [ 'wsgi', 'jar', 'python' ]) {
@@ -44,6 +45,7 @@ class profiles::application (
     $app_type = 'wsgi',
     $notification_period = undef,
     $check_period = undef,
+    $healthcheck = undef,
 
     ){
     if ($app_type in [ 'wsgi', 'jar']) {
@@ -60,6 +62,36 @@ class profiles::application (
         notifications_enabled => 1,
         notification_period   => $notification_period,
         service_description   => "LR tcp ${name}"
+      }
+    }
+  }
+
+  # Define tcp_check for bespoke applications
+  define http_check(
+
+    $bind = undef,
+    $app_type = 'wsgi',
+    $notification_period = undef,
+    $check_period = undef,
+    $healthcheck = false
+
+    ){
+    if $healthcheck {
+      if ($app_type in [ 'wsgi', 'jar']) {
+        @@nagios_service { "${::hostname}-lr-${name}-http_health_check" :
+          ensure                => present,
+          check_command         => "check_nrpe!check_service_http\\!'127.0.0.1'\\!'/health'\\!'${bind}'\\!'OK,ok'",
+          mode                  => '0644',
+          owner                 => root,
+          use                   => 'generic-service',
+          host_name             => $::hostname,
+          check_period          => $check_period,
+          contact_groups        => 'admins',
+          notification_interval => 0,
+          notifications_enabled => 1,
+          notification_period   => $notification_period,
+          service_description   => "LR healthcheck ${name}"
+        }
       }
     }
   }
@@ -81,7 +113,7 @@ class profiles::application (
     create_resources('wsgi::application', $applications, $app_defaults)
 
     # Filter hash to only return 'bind' and 'app_type' keys and values
-    $check_hash = hash_filter($applications, ['bind','app_type'])
+    $check_hash = hash_filter($applications, ['bind','app_type','healthcheck'])
 
     # Set defualts for check resources
     $defaults = { notification_period => $time_period,
@@ -92,5 +124,8 @@ class profiles::application (
 
     # Create tcp check for each application specified for server
     create_resources(tcp_check, $check_hash, $defaults)
+
+    # Create http healtcheck for each application specified for server (where enabled)
+    create_resources(http_check, $check_hash, $defaults)
   }
 }
