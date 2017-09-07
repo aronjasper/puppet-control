@@ -18,12 +18,19 @@ class profiles::application (
     $notification_period = undef,
     $check_period = undef,
     $healthcheck = undef,
+    $rpm_package = undef,
 
     ){
+
+    $service_name = $rpm_package ? {
+      undef   => $name,
+      default => $rpm_package
+    }
+
     if ($app_type in [ 'wsgi', 'jar', 'python' ]) {
       @@nagios_service { "${::hostname}-lr-${name}" :
         ensure                => present,
-        check_command         => "check_nrpe!check_service_procs\\!2:20\\!1:25\\!${name}",
+        check_command         => "check_nrpe!check_service_procs\\!2:20\\!1:25\\!${service_name}",
         mode                  => '0644',
         owner                 => root,
         use                   => 'generic-service',
@@ -113,7 +120,7 @@ class profiles::application (
     create_resources('wsgi::application', $applications, $app_defaults)
 
     # Filter hash to only return 'bind' and 'app_type' keys and values
-    $check_hash = hash_filter($applications, ['bind','app_type','healthcheck'])
+    $check_hash = hash_filter($applications, ['bind','app_type','healthcheck','rpm_package'])
 
     # Set defualts for check resources
     $defaults = { notification_period => $time_period,
