@@ -21,9 +21,9 @@ class profiles::puppet::master (
 
   $control_repo = 'https://github.com/LandRegistry-Ops/puppet-control.git',
   $hiera_path   = '/etc/puppet/hiera.yaml',
-  $arguments   = '--no-daemonize --onetime --logdest syslog > /dev/null 2>&1',
-  $run_hours   = '08-16',
-  $run_days    = '1-5'
+  $arguments    = '--no-daemonize --onetime --logdest syslog > /dev/null 2>&1',
+  $run_hours    = '08-16',
+  $run_days     = '1-5'
 
   ){
 
@@ -157,7 +157,7 @@ class profiles::puppet::master (
       ssl_cert_path      => "/var/lib/puppet/ssl/certs/${::fqdn}.pem",
       ssl_key_path       => "/var/lib/puppet/ssl/private_keys/${::fqdn}.pem",
       ssl_ca_cert_path   => '/var/lib/puppet/ssl/certs/ca.pem',
-      require             => Exec ['check_presence']
+      require            => Exec ['check_presence']
     }
 
     class { 'puppetdb::master::config':
