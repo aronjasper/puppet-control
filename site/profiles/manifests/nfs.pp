@@ -29,12 +29,11 @@ class profiles::nfs (
 
   # creates a directory for mount only if it does not exist
 
-  exec { "create_directory":
-  command => "mkdir $mount_point",
-  unless => "test -d $mount_point",
-  path    => "/usr/local/bin/:/bin/",
-  before => Mount[$mount_point]
-
+  exec { 'create_nfs_directory':
+    command   => "mkdir ${mount_point}",
+    unless    => "test -d ${mount_point}",
+    path      => '/usr/local/bin/:/bin/',
+    before    => Mount[$mount_point]
   }
 
 
