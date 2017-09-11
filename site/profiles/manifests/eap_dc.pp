@@ -22,7 +22,7 @@ class profiles::eap_dc(){
     host_config  => 'host-master.xml',
     properties   => {
       'jboss.bind.address'            => $data_addr,
-      'jboss.bind.address.management' => $mgmt_addr,
+      'jboss.bind.address.management' => '0.0.0.0/0,
     }
   }
 
