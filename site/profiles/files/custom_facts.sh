@@ -10,6 +10,7 @@ RECENTLY_PATCHED=$(echo $RECENTLY_PATCHED | sed 's/\(.*\),/\1 /')
 
 ## Get the current status of the applications
 APP_STATUS="{"
+if [ -d "/opt/landregistry/applications/" ]; then
 for d in /opt/landregistry/applications/*/lr-*.service ; do
     SERVICE_NAME=$(basename $d)
     APP_PATH=$(dirname $d)
@@ -17,13 +18,11 @@ for d in /opt/landregistry/applications/*/lr-*.service ; do
     SERVICE_STATUS=$(sudo systemctl | grep ${SERVICE_NAME} | awk '{print $4;}')
     SERVICE_PORT=$(cat $APP_PATH/startup.sh | grep "export PORT" | tr -dc '0-9')
     SERVICE_HEALTH=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:$SERVICE_PORT/health)
-    echo $SERVICE_STATUS
-    echo $APP_PATH
-    echo $SERVICE_PORT
-    echo $SERVICE_HEALTH
-    APP_STATUS=$(echo $APP_STATUS "\"$APP_NAME\": {\"port\": \"${SERVICE_PORT}\", \"application_health\": \"${SERVICE_HEALTH}\", \"service_health\": \"${SERVICE_STATUS}\"}," )
+    CURRENT_COMMIT=$(cat $APP_PATH/COMMIT)
+    APP_STATUS=$(echo $APP_STATUS "\"$APP_NAME\": {\"port\": \"${SERVICE_PORT}\", \"application_health\": \"${SERVICE_HEALTH}\", \"service_health\": \"${SERVICE_STATUS}\", \"current_commit\": \"${CURRENT_COMMIT}\"}," )
 done
 APP_STATUS=$(echo $APP_STATUS | sed 's/\(.*\),/\1 /')
+fi
 APP_STATUS=$(echo $APP_STATUS "}")
 
 echo "lr_application_status=${APP_STATUS}"
