@@ -21,13 +21,13 @@
   dns_alt_names = puppet, <%= @fqdn %>
   autosign = true
   certname = <%= @fqdn %>
-  #storeconfigs = true
-  #storeconfigs_backend = puppetdb
+  storeconfigs = true
+  storeconfigs_backend = puppetdb
 
 
 [agent]
   environment = <%= @environment %>
-  report = true
+  report = false
   digest_algorithm = md5
   ordering = title-hash
   configtimeout = 2m
