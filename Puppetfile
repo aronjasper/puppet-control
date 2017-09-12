@@ -84,7 +84,10 @@ mod 'puppet-pulp',                     :git => 'https://github.com/LandRegistry-
                                        :ref => '0.0.13'
 mod 'puppet-cpan',                     :git => 'https://github.com/meltwater/puppet-cpan',
                                        :ref => '14ec4ac9850bcc55d6cc5bad52a7fe9ce3745c32'
-
+mod 'landregistry/lrtomcat',           :git => 'https://github.com/LandRegistry-Ops/puppet-tomcat.git',
+                                       :ref => '0.2.1'
+mod 'biemond-wildfly',                 :git => 'https://github.com/biemond/biemond-wildfly.git',
+                                       :ref => 'v1.2.8'
 
 
 # Dependency modules
@@ -103,13 +106,14 @@ mod 'puppetlabs/inifile',                    '1.5.0'
 mod 'puppetlabs/java',                       '1.3.0'
 mod 'puppetlabs/pe_gem',                     '0.2.0'
 mod 'puppetlabs/ruby',                       '0.5.0'
-mod 'puppetlabs/stdlib',                     '4.12.0'
+mod 'puppetlabs/stdlib',                     '4.15.0'
 mod 'puppetlabs/vcsrepo',                    '1.3.2'
 mod 'richardc/datacat',                      '0.6.2'
 mod 'stahnma/epel',                          '1.2.2'
 mod 'ajjahn/dns',                            '2.0.2'
 mod 'dsestero/download_uncompress',          '1.3.0'
-mod 'herculesteam/augeasproviders_core',     '2.1.3'
-mod 'herculesteam/augeasproviders_shellvar', '2.2.1'
-mod 'camptocamp/systemd',                    '0.4.0'
-mod 'camptocamp/tomcat',                     '0.16.2'
+mod 'jethrocarr/initfact',                   '1.0.1'
+mod 'herculesteam-augeasproviders_core',     '2.1.3'
+mod 'herculesteam-augeasproviders_shellvar', '2.2.1'
+mod 'camptocamp-systemd',                    '0.4.0'
+mod 'camptocamp-tomcat',                     '0.16.2'

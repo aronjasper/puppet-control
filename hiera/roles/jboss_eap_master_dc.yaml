@@ -1,0 +1,22 @@
+---
+classes:
+  - profiles::packages
+  - profiles::eap_dc
+
+wildfly::version: '7.1'
+wildfly::install_source: 'http://192.168.35.60/jboss-eap-7.1.0.Alpha.tar.gz'
+wildfly::mgmt_user:
+  'username': 'slave'
+  'password': 'passw0rd!'
+wildfly::dc_server_groups:
+  'backend_cluster_server_group':
+    config:
+      profile: 'full-ha'
+      socket-binding-group: 'full-ha-sockets'
+  'frontend_lb_server_group':
+    config:
+      profile: 'ha'
+      socket-binding-group: 'ha-sockets'
+
+packages:
+  - java-1.8.0-openjdk-1.8.0.121-0.b13.el7_3
