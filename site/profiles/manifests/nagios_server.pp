@@ -52,16 +52,42 @@
 #        notification_period: 24x7
 #        notification_interval: 0
 #        service_description: Ping
+#
+#    nagios_hostgroups:
+#      network_location_zone1:
+#        ensure: present
+#        alias: hostgroup-network_location_zone1
+#      development:
+#        ensure: present
+#        alias: hostgroup-development
+#      puppet_local:
+#        ensure: present
+#        alias: hostgroup-puppet_local
+#      service_test:
+#        ensure: present
+#        alias: hostgroup-service_test
 
 class profiles::nagios_server(
 
   $nagios_hosts         = hiera_hash('nagios_hosts',false),
-  $nagios_hostgroups    = hiera_hash('nagios_hostgroups',false),
+  $nagios_hostgroups    = hiera_hash('nagios_hostgroups',{ network_location_zone1 =>
+                                                              {ensure => present,
+                                                              alias  => 'hostgroup-network_location_zone1'},
+                                                            development =>
+                                                              {ensure => present,
+                                                              alias  => 'hostgroup-development'},
+                                                            puppet_local =>
+                                                              {ensure => present,
+                                                              alias  => 'hostgroup-puppet_local'},
+                                                            service_test =>
+                                                              {ensure => present,
+                                                              alias  => 'hostgroup-service_test'}}),
   $nagios_services      = hiera_hash('nagios_services',false),
   $nagios_commands      = hiera_hash('nagios_commands',false),
   $nagios_contacts      = hiera_hash('nagios_contacts',false),
-  $nagios_contactgroups = hiera_hash('nagios_contactgroups',false),
-  $monitor_localhost    = false
+  $nagios_contactgroups = hiera_hash('nagios_contactgroups',{test => {alias => contactgroup-test},
+                                                            development => {alias => contactgroup-development}}),
+  $monitor_localhost    = false,
 
   ){
 
@@ -102,7 +128,17 @@ class profiles::nagios_server(
   }
 
   # Import nagios resources from heira
-  $resource_defaults = {notify  => Service['nagios']}
+  $resource_defaults        = {notify  => Service['nagios']}
+  $contact_resource_defauts = {host_notifications_enabled   => '1',
+                              service_notifications_enabled => '1',
+                              service_notification_period   => '24x7',
+                              host_notification_period      => '24x7',
+                              service_notification_options  => 'u,c',
+                              host_notification_options     => 'd,u',
+                              service_notification_commands => 'notify-service-by-email',
+                              host_notification_commands    => 'notify-host-by-email',
+                              can_submit_commands           => '1',
+                              notify                        => Service['nagios']}
 
   if $nagios_hosts {
     create_resources('nagios_host', $nagios_hosts, $resource_defaults)
@@ -121,7 +157,7 @@ class profiles::nagios_server(
   }
 
   if $nagios_contacts {
-    create_resources('nagios_contact', $nagios_contacts, $resource_defaults)
+    create_resources('nagios_contact', $nagios_contacts, $contact_resource_defauts)
   }
 
   if $nagios_contactgroups {

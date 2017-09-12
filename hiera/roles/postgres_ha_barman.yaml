@@ -1,4 +1,4 @@
 ---
 
 classes:
-  - 'profiles::postgres_ha_barman'
+  - 'postgres::postgres_ha_barman'

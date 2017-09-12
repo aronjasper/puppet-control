@@ -1,0 +1,4 @@
+---
+
+classes:
+  - 'postgres::postgres_sa'

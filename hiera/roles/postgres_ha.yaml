@@ -1,4 +1,4 @@
 ---
 
 classes:
-  - 'profiles::postgres_ha'
+  - 'postgres::postgres_ha'

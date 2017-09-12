@@ -42,7 +42,8 @@ class profiles::puppet::agent (
     puppet_run_style    => 'external',
     puppet_run_interval => 30,
     splay               => true,
-    ordering            => 'title-hash'
+    ordering            => 'title-hash',
+    report              => false
   }
 
   # Only carry out Puppet runs inside of a specific time window
