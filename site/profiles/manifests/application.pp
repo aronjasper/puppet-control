@@ -119,15 +119,18 @@ class profiles::application (
     # Create application resources for each application specified for server
     create_resources('wsgi::application', $applications, $app_defaults)
 
-    # Filter hash to only return 'bind' and 'app_type' keys and values
-    $check_hash = hash_filter($applications, ['bind','app_type','healthcheck','rpm_package'])
+    # Filter hash to only return 'bind', 'app_type' and 'healthcheck' keys and values
+    $check_hash = hash_filter($applications, ['bind','app_type','healthcheck'])
+
+    # Include rpm_package parameter for the service check
+    $service_check_hash = hash_filter($applications, ['bind','app_type','healthcheck','rpm_package'])
 
     # Set defualts for check resources
     $defaults = { notification_period => $time_period,
                   check_period        => $time_period}
 
     # Create process check for each application specified for server
-    create_resources(service_check, $check_hash, $defaults)
+    create_resources(service_check, $service_check_hash, $defaults)
 
     # Create tcp check for each application specified for server
     create_resources(tcp_check, $check_hash, $defaults)
