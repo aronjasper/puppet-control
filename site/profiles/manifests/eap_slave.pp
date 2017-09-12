@@ -24,7 +24,7 @@ class profiles::eap_slave (
     host_config  => 'host-slave.xml',
     properties   => {
       'jboss.bind.address'            => $data_addr,
-      'jboss.bind.address.management' => $mgmt_addr,
+      'jboss.bind.address.management' => $data_addr,
       'jboss.domain.master.address'   => $dc
     }
   }
