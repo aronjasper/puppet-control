@@ -5,7 +5,7 @@ CHECK_UPDATES=$(echo $CHECK_UPDATES | sed 's/\(.*\),/\1 /')
 CHECK_UPDATES=$(echo "{" $CHECK_UPDATES "}")
 
 ## Get dates for recently applied patches
-RECENTLY_PATCHED=$(echo "{" $(rpm -qa --qf '{%{INSTALLTIME} "%{NAME}": "%{INSTALLTIME}",\n' | sort -n | tail -200 |cut -d' ' -f2-) "}")
+RECENTLY_PATCHED=$(echo "{" $(rpm -qa --qf '{%{INSTALLTIME} \["name": "%{NAME}", "epoch_install": "%{INSTALLTIME}", "version": "%{VERSION}"\],\n' | sort -n | tail -250 |cut -d' ' -f2-) "}")
 RECENTLY_PATCHED=$(echo $RECENTLY_PATCHED | sed 's/\(.*\),/\1 /')
 
 ## Get the current status of the applications
