@@ -49,7 +49,7 @@ class profiles::eap_dc(){
     recurse => true,
     require => File[$modules]
   }
-  exec { "download ibm driver license":
+  exec { 'download ibm driver license':
     command  => "wget ${repository_source}/db2jcc_license_cisuz.jar -P ${wildfly::dirname}/modules/com/ibm/main",
     path     => ['/bin', '/usr/bin', '/sbin'],
     loglevel => 'notice',
@@ -58,7 +58,7 @@ class profiles::eap_dc(){
     creates  => "${wildfly::dirname}/modules/com/ibm/main/db2jcc_license_cisuz.jar",
     require  => File[$modules],
   }
-  exec { "download ibm driver":
+  exec { 'download ibm driver':
     command  => "wget ${repository_source}/db2jcc4.jar -P ${wildfly::dirname}/modules/com/ibm/main",
     path     => ['/bin', '/usr/bin', '/sbin'],
     loglevel => 'notice',
@@ -75,7 +75,7 @@ class profiles::eap_dc(){
     recurse => true,
     require => File[$modules]
   }
-  exec { "download oracle driver":
+  exec { 'download oracle driver':
     command  => "wget ${repository_source}/ojdbc7.jar -P ${wildfly::dirname}/modules/com/oracle/main",
     path     => ['/bin', '/usr/bin', '/sbin'],
     loglevel => 'notice',
@@ -84,7 +84,7 @@ class profiles::eap_dc(){
     creates  => "${wildfly::dirname}/modules/com/oracle/main/ojdbc7.jar",
     require  => File[$modules],
   }
-  
+
   $app_user = hiera_hash('wildfly::app_user',false)
   create_resources('wildfly::config::app_user', $app_user)
 
@@ -114,7 +114,7 @@ class profiles::eap_dc(){
 
   $resource_adapters = hiera_hash('wildfly::resource_adapters',false)
   create_resources('wildfly::resource', $resource_adapters)
-  
+
   $servers = hiera_hash('wildfly::servers',false)
   create_resources('wildfly::resource', $servers)
 
