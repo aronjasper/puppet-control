@@ -2,21 +2,21 @@ forge 'https://forgeapi.puppetlabs.com'
 
 # Third-party modules
 mod 'ajcrowe/supervisord',             '0.6.1'
-mod 'alphagov/account',                :git => 'https://github.com/alphagov/puppet-account.git',
+mod 'account',                         :git => 'https://github.com/alphagov/puppet-account.git',
                                        :ref => '8bc0e9981174fd175d630dd98538334a2814065b'
-mod 'puppet-elasticsearch_old',        :git => 'https://github.com/LandRegistry-Ops/puppet-elasticsearch_old.git',
+mod 'elasticsearch_old',               :git => 'https://github.com/LandRegistry-Ops/puppet-elasticsearch_old.git',
                                        :ref => '0.11.11'
 mod 'elastic/elasticsearch',           '5.1.0'
 mod 'ispavailability/file_concat',     '0.2.1'
 mod 'jfryman/nginx',                   '0.3.0'
 mod 'jfryman/selinux',                 '0.4.0'
-mod 'puppet-gradle',                   :git => 'https://github.com/LandRegistry-Ops/puppet-gradle.git',
+mod 'gradle',                          :git => 'https://github.com/LandRegistry-Ops/puppet-gradle.git',
                                        :ref => '1.1.0'
-mod 'puppet-wsgi',                     :git => 'https://github.com/LandRegistry-Ops/puppet-wsgi.git',
+mod 'wsgi',                            :git => 'https://github.com/LandRegistry-Ops/puppet-wsgi.git',
                                        :ref => '1.4.2'
 mod 'leinaddm/htpasswd',               '0.0.3'
 mod 'maestrodev/wget',                 '1.7.3'
-mod 'openstackci/pip',                 :git => 'https://github.com/openstack-infra/puppet-pip.git',
+mod 'pip',                             :git => 'https://github.com/openstack-infra/puppet-pip.git',
                                        :ref => '88c1e708d421f397283fd88266147175855426dd'
 mod 'puppetlabs/firewall',             '1.3.0'
 mod 'puppetlabs/mongodb',              '0.14.0'
@@ -24,7 +24,7 @@ mod 'puppetlabs/ntp',                  '3.3.0'
 mod 'puppetlabs/postgresql',           '4.7.1'
 mod 'puppetlabs/puppetdb',             '4.1.0'
 mod 'puppetlabs/rabbitmq',             '5.4.0'
-mod 'rtyler/jenkins',                  :git => 'https://github.com/jenkinsci/puppet-jenkins.git',
+mod 'jenkins',                         :git => 'https://github.com/jenkinsci/puppet-jenkins.git',
                                        :ref => 'f2f086130f390220b33edf09b25d3adf76efc28a'
 mod 'saz/sudo',                        '3.0.9'
 mod 'vshn/gitlab',                     '1.9.1'
@@ -37,56 +37,57 @@ mod 'camptocamp/openssl',              '1.7.1'
 mod 'puppetlabs/java_ks',              '1.4.1'
 mod 'pcfens/ca_cert',                  '1.3.0'
 mod 'thias/resolvconf',                '0.0.3'
-mod 'puppet-dnsserver',                :git => 'https://github.com/LandRegistry-Ops/puppet-dnsserver.git',
+mod 'dnsserver',                       :git => 'https://github.com/LandRegistry-Ops/puppet-dnsserver.git',
                                        :ref => '5be34a1c13b4f1b754a2307a3b1b27936e563ff2'
-mod 'puppet-files',                    :git => 'https://github.com/LandRegistry-Ops/puppet-files.git',
+mod 'files',                           :git => 'https://github.com/LandRegistry-Ops/puppet-files.git',
                                        :ref => '3d3cbee15a91abf160275abe7d2961cf89beba77'
-mod 'puppet-crons',                    :git => 'https://github.com/LandRegistry-Ops/puppet-crons.git',
+mod 'crons',                           :git => 'https://github.com/LandRegistry-Ops/puppet-crons.git',
                                        :ref => '1.0.0'
-mod 'puppet-filebeat',                 :git => 'https://github.com/LandRegistry-Ops/puppet-filebeat.git',
+mod 'filebeat',                        :git => 'https://github.com/LandRegistry-Ops/puppet-filebeat.git',
                                        :ref => '1.1.2'
-mod 'puppet-packetbeat',               :git => 'https://github.com/LandRegistry-Ops/puppet-packetbeat.git',
+mod 'packetbeat',                      :git => 'https://github.com/LandRegistry-Ops/puppet-packetbeat.git',
                                        :ref => '1.0.5'
-mod 'puppet-logstash',                 :git => 'https://github.com/LandRegistry-Ops/puppet-logstash.git',
+mod 'logstash',                        :git => 'https://github.com/LandRegistry-Ops/puppet-logstash.git',
                                        :ref => '1.0.10'
 mod 'willdurand/nodejs',               '1.9.5'
-mod 'puppet-rabbit',                   :git => 'https://github.com/LandRegistry-Ops/puppet-rabbit.git',
+mod 'rabbit',                          :git => 'https://github.com/LandRegistry-Ops/puppet-rabbit.git',
                                        :ref => '3.0.9'
-mod 'puppet-elastic',                  :git => 'https://github.com/LandRegistry-Ops/puppet-elastic.git',
+mod 'elastic',                         :git => 'https://github.com/LandRegistry-Ops/puppet-elastic.git',
                                        :ref => '3.0.17'
-mod 'puppet-kibana',                   :git => 'https://github.com/LandRegistry-Ops/elastic-puppet-kibana.git',
+mod 'kibana',                          :git => 'https://github.com/LandRegistry-Ops/elastic-puppet-kibana.git',
                                        :ref => '3.0.2'
-mod 'puppet-firewallservice',          :git => 'https://github.com/LandRegistry-Ops/puppet-firewallservice.git',
+mod 'firewallservice',                 :git => 'https://github.com/LandRegistry-Ops/puppet-firewallservice.git',
                                        :ref => '0.1.5'
-mod 'puppet-nagios',                   :git => 'https://github.com/LandRegistry-Ops/puppet-nagios.git',
+mod 'nagios',                          :git => 'https://github.com/LandRegistry-Ops/puppet-nagios.git',
                                        :ref => '0.11.0'
-mod 'puppet-nagiosclient',             :git => 'https://github.com/LandRegistry-Ops/puppet-nagiosclient.git',
+mod 'nagiosclient',                    :git => 'https://github.com/LandRegistry-Ops/puppet-nagiosclient.git',
                                        :ref => '0.13.1'
-mod 'puppet-postgres',                 :git => 'https://github.com/LandRegistry-Ops/puppet-postgres.git',
+mod 'postgres',                        :git => 'https://github.com/LandRegistry-Ops/puppet-postgres.git',
                                        :ref => '1.0.11'
-mod 'landregistry/powerdns',           :git => 'https://github.com/LandRegistry-Ops/puppet-powerdns.git',
+mod 'powerdns',                        :git => 'https://github.com/LandRegistry-Ops/puppet-powerdns.git',
                                        :ref => '0.3.0'
-mod 'landregistry/security',           :git => 'https://github.com/LandRegistry-Ops/puppet-security.git',
+mod 'security',                        :git => 'https://github.com/LandRegistry-Ops/puppet-security.git',
                                        :ref => '0.3.10'
 mod 'ghoneycutt/hosts',                '2.5.0'
-mod 'puppet-opendj',                   :git => 'https://github.com/LandRegistry-Ops/puppet-opendj.git',
+mod 'opendj',                          :git => 'https://github.com/LandRegistry-Ops/puppet-opendj.git',
                                        :ref => 'd5ca4a4fcaddac366b5a2f2fed62269fb2f2f28c'
-mod 'puppet-openresty',                :git => 'https://github.com/LandRegistry-Ops/puppet-openresty.git',
+mod 'openresty',                       :git => 'https://github.com/LandRegistry-Ops/puppet-openresty.git',
                                        :ref => '5c073c509ff9405e27c39f93c1154412c530ac39'
-mod 'landregistry/static_content',     :git => 'https://github.com/LandRegistry/puppet-openresty-static-content.git',
+mod 'static_content',                  :git => 'https://github.com/LandRegistry/puppet-openresty-static-content.git',
                                        :ref => '674d20de098df61ad7b08437a54496de67ce56c2'
-mod 'puppet-geoserver',                :git => 'https://github.com/LandRegistry-Ops/puppet-geoserver.git',
+mod 'geoserver',                       :git => 'https://github.com/LandRegistry-Ops/puppet-geoserver.git',
                                        :ref => '9f4cff7c6388beb56884ef641181960424e1a596'
-mod 'attachmentgenie/mailhog',         '1.0.0'
-mod 'puppet-redis',                    :git => 'https://github.com/LandRegistry-Ops/puppet-redis.git',
+mod 'mailhog',                         :git => 'https://github.com/LandRegistry-Ops/attachmentgenie-mailhog.git',
+                                       :ref => '2ff9711bed8df2aba1047eb401f0f8dae8c9f64d'
+mod 'redis',                           :git => 'https://github.com/LandRegistry-Ops/puppet-redis.git',
                                        :ref => 'v3.2.1'
-mod 'puppet-pulp',                     :git => 'https://github.com/LandRegistry-Ops/puppet-pulp',
+mod 'pulp',                            :git => 'https://github.com/LandRegistry-Ops/puppet-pulp',
                                        :ref => '0.0.13'
-mod 'puppet-cpan',                     :git => 'https://github.com/meltwater/puppet-cpan',
+mod 'cpan',                            :git => 'https://github.com/meltwater/puppet-cpan',
                                        :ref => '14ec4ac9850bcc55d6cc5bad52a7fe9ce3745c32'
-mod 'landregistry/lrtomcat',           :git => 'https://github.com/LandRegistry-Ops/puppet-tomcat.git',
-                                       :ref => '0.2.3'
-mod 'biemond-wildfly',                 :git => 'https://github.com/biemond/biemond-wildfly.git',
+mod 'lrtomcat',                        :git => 'https://github.com/LandRegistry-Ops/puppet-tomcat.git',
+                                       :ref => '0.2.4'
+mod 'wildfly',                         :git => 'https://github.com/biemond/biemond-wildfly.git',
                                        :ref => 'v1.2.8'
 
 
