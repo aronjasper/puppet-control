@@ -4,68 +4,66 @@ classes:
   - 'profiles::jenkins'
   - 'profiles::ansible'
 
-profiles::jenkins::plugins:
+jenkins_plugins:
+  active-directory:
+    version: 1.41
+  analysis-core:
+    version: 1.72
+  ansicolor:
+    version: 0.4.1
+  build-monitor-plugin:
+    version: 1.12+build.201704111018
+  cobertura:
+    version: 1.9.7
   git:
     version: 2.4.0
   git-client:
     version: 1.19.0
-  scm-api:
-    version: 0.2
-  matrix-project:
-    version: 1.4.1
-  token-macro:
-    version: 1.10
-  active-directory:
-    version: 1.41
-  scm-sync-configuration:
-    version: 0.0.8
-  subversion:
-    version: 1.54
-  analysis-core:
-    version: 1.72
-  tasks:
-    version: 4.45
+  github:
+    version: 1.13.3
+  github-api:
+    version: 1.69
+  github-oauth:
+    version: 0.22.2
+  gitlab-hook:
+    version: 1.4.2
+  gitlab-plugin:
+    version: 1.2.2
   mapdb-api:
     version: 1.0.6.0
+  # matrix-project:
+  #   version: 1.4.1
+  parameterized-trigger:
+    version: 2.29
+  plain-credentials:
+    version: 1.1
+  pyenv:
+    version: 0.0.7
+  rbenv:
+    version: 0.0.16
+  role-strategy:
+    version: 2.2.0
   ruby-runtime:
     version: 0.12
     timeout: 240
-  rbenv:
-    version: 0.0.16
-  ansicolor:
-    version: 0.4.1
+  scm-api:
+    version: 0.2
   scm-sync-configuration:
     version: 0.0.8
-  role-strategy:
-    version: 2.2.0
-  github-api:
-    version: 1.69
-  plain-credentials:
-    version: 1.1
-  github:
-    version: 1.13.3
-  xunit:
-    version: 1.97
-  cobertura:
-    version: 1.9.7
-  pyenv:
-    version: 0.0.7
-  github-oauth:
-    version: 0.22.2
-  build-monitor-plugin:
-    version: 1.6+build.142
-  parameterized-trigger:
-    version: 2.29
-  text-finder:
-    version: 1.10
-  workflow-step-api:
-    version: 2.0
   structs:
     version: 1.1
-  gitlab-plugin:
-    version: 1.2.2
-  gitlab-hook:
-    version: 1.4.2
+  # subversion:
+  #   version: 1.54
+  tasks:
+    version: 4.45
+  text-finder:
+    version: '1.10'
+  token-macro:
+    version: '1.10'
+  workflow-step-api:
+    version: 2.0
+  xunit:
+    version: 1.97
 
 profiles::jenkins::jobs:
   sample-build-and-ut:

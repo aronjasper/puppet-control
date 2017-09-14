@@ -9,6 +9,7 @@ classes:
   - 'selinux'
   - 'sudo'
   - 'resolvconf'
+  - 'security::antivirus'
 
 # Prevent sudo from purging unmanaged sudo configs (for vagrant)
 sudo::purge: false

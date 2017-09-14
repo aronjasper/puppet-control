@@ -25,39 +25,61 @@ class profiles::rabbitmq(
   $cluster                   = false,
   $cluster_nodes             = [],
   $erlang_cookie             = 'super_secret_key',
+  $erlang_epel_enable        = true,
   $admin_enable              = false,
+  $monitoring                = true,
   $rabbitmq_users            = hiera_hash('rabbitmq_users', false),
   $rabbitmq_user_permissions = hiera_hash('rabbitmq_user_permissions', false),
   $rabbitmq_vhosts           = hiera_hash('rabbitmq_vhosts', false),
-  $rabbitmq_policy           = hiera_hash('rabbitmq_policy', false)
-
+  $rabbitmq_policy           = hiera_hash('rabbitmq_policy', false),
+  $time_period               = hiera('nagios_time_period', '24x7'),
+  $package_source            = undef,
+  $rabbitmq_key              = undef,
+  $package_gpg_key           = undef,
 ){
 
+  if $monitoring {
+    include profiles::rabbitmq_monitoring
+  }
   # Load SELinuux policy for RabbitMQ
   selinux::module { 'rabbit':
     ensure => 'present',
     source => 'puppet:///modules/profiles/rabbit.te'
   }
 
-  class { 'erlang': epel_enable => true }
+  class { 'erlang': epel_enable => $erlang_epel_enable }
   include ::erlang
+
+  $real_source = $package_source ? {
+    undef   => "https://www.rabbitmq.com/releases/rabbitmq-server/v${version}/rabbitmq-server-${version}-1.noarch.rpm",
+    default => $package_source
+  }
 
   # Install rabbit direct from rabbit (if not epel version)
   if $version != '3.3.5' {
     package { "rabbitmq-server-${version}-1.noarch" :
       ensure   => 'installed',
       provider => 'rpm',
-      source   => "https://www.rabbitmq.com/releases/rabbitmq-server/v${version}/rabbitmq-server-${version}-1.noarch.rpm",
-      require  => Class[erlang]
+      source   => $real_source,
+      require  => Class[erlang],
     }
     notify { "rabbit-server package version ${version} installed direct from rabbit":}
   } else {
     notify { "rabbit-server package version ${version} will be installed from epel":}
   }
 
+  if $rabbitmq_key {
+    file{ $package_gpg_key:
+      ensure  => file,
+      content => $rabbitmq_key,
+    }
+  }
+
   case $cluster {
     true : {
       class { '::rabbitmq':
+        key_content              => $rabbitmq_key,
+        package_gpg_key          => $package_gpg_key,
         version                  => "${version}-1",
         repos_ensure             => true,
         port                     => $port,
@@ -71,12 +93,15 @@ class profiles::rabbitmq(
         config_cluster           => true,
         admin_enable             => $admin_enable,
         require                  => Class[erlang]
+
       }
 
     }
 
     default : {
       class { '::rabbitmq':
+        key_content       => $rabbitmq_key,
+        package_gpg_key   => $package_gpg_key,
         version           => "${version}-1",
         repos_ensure      => true,
         port              => $port,

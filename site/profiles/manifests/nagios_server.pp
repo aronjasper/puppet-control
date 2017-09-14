@@ -38,7 +38,7 @@
 #        use: linux-server
 #        max_check_attempts: 5
 #        check_period: 24x7
-#        notification_interval: 30
+#        notification_interval: 0
 #        notification_period: 24x7
 #
 #    nagios_services:
@@ -50,21 +50,61 @@
 #        use: generic-service
 #        host_name: test_host
 #        notification_period: 24x7
+#        notification_interval: 0
 #        service_description: Ping
+#
+#    nagios_hostgroups:
+#      network_location_zone1:
+#        ensure: present
+#        alias: hostgroup-network_location_zone1
+#      development:
+#        ensure: present
+#        alias: hostgroup-development
+#      puppet_local:
+#        ensure: present
+#        alias: hostgroup-puppet_local
+#      service_test:
+#        ensure: present
+#        alias: hostgroup-service_test
 
 class profiles::nagios_server(
 
   $nagios_hosts         = hiera_hash('nagios_hosts',false),
-  $nagios_hostgroups    = hiera_hash('nagios_hostgroups',false),
+  $nagios_hostgroups    = hiera_hash('nagios_hostgroups',{ network_location_zone1 =>
+                                                              {ensure => present,
+                                                              alias  => 'hostgroup-network_location_zone1'},
+                                                            development =>
+                                                              {ensure => present,
+                                                              alias  => 'hostgroup-development'},
+                                                            puppet_local =>
+                                                              {ensure => present,
+                                                              alias  => 'hostgroup-puppet_local'},
+                                                            service_test =>
+                                                              {ensure => present,
+                                                              alias  => 'hostgroup-service_test'}}),
   $nagios_services      = hiera_hash('nagios_services',false),
   $nagios_commands      = hiera_hash('nagios_commands',false),
   $nagios_contacts      = hiera_hash('nagios_contacts',false),
-  $nagios_contactgroups = hiera_hash('nagios_contactgroups',false),
-  $monitor_localhost    = false
+  $nagios_contactgroups = hiera_hash('nagios_contactgroups',{test => {alias => contactgroup-test},
+                                                            development => {alias => contactgroup-development}}),
+  $monitor_localhost    = false,
 
   ){
 
   include nagios
+  include profiles::smtp_relay
+
+  # Create time period for aws_dev servers to prevent alertiing when servers
+  # with the 'managed' tag are shutdown. Adjusted for BST (Server time is UTC)
+  nagios_timeperiod { 'dev_aws':
+    ensure    => present,
+    alias     => 'Time during which managed aws_dev servers should be up',
+    monday    => '06:10-18:50',
+    tuesday   => '06:10-18:50',
+    wednesday => '06:10-18:50',
+    thursday  => '06:10-18:50',
+    friday    => '06:10-18:50'
+  }
 
   # Collect nagios resources from puppetdb
   Nagios_host <<||>> {
@@ -88,7 +128,17 @@ class profiles::nagios_server(
   }
 
   # Import nagios resources from heira
-  $resource_defaults = {notify  => Service['nagios']}
+  $resource_defaults        = {notify  => Service['nagios']}
+  $contact_resource_defauts = {host_notifications_enabled   => '1',
+                              service_notifications_enabled => '1',
+                              service_notification_period   => '24x7',
+                              host_notification_period      => '24x7',
+                              service_notification_options  => 'u,c',
+                              host_notification_options     => 'd,u',
+                              service_notification_commands => 'notify-service-by-email',
+                              host_notification_commands    => 'notify-host-by-email',
+                              can_submit_commands           => '1',
+                              notify                        => Service['nagios']}
 
   if $nagios_hosts {
     create_resources('nagios_host', $nagios_hosts, $resource_defaults)
@@ -107,7 +157,7 @@ class profiles::nagios_server(
   }
 
   if $nagios_contacts {
-    create_resources('nagios_contact', $nagios_contacts, $resource_defaults)
+    create_resources('nagios_contact', $nagios_contacts, $contact_resource_defauts)
   }
 
   if $nagios_contactgroups {
@@ -124,5 +174,20 @@ class profiles::nagios_server(
       notify  => Service['nagios'],
       require => Package['nagios']
     }
+  }
+
+  # Configure nagios not to send ip addresses in email alerts
+  nagios_command { 'notify-host-by-email':
+    command_line => '/usr/bin/printf "%b" "***** Nagios *****\n\nNotification Type: $NOTIFICATIONTYPE$\nHost: $HOSTNAME$\nState: $HOSTSTATE$\nInfo: $HOSTOUTPUT$\n\nDate/Time: $LONGDATETIME$\n" | /usr/bin/mail -s "** $NOTIFICATIONTYPE$ Host Alert: $HOSTNAME$ is $HOSTSTATE$ **" $CONTACTEMAIL$',
+    target       => '/etc/nagios/objects/commands.cfg',
+    notify       => Service['nagios'],
+    require      => Package['nagios']
+  }
+
+  nagios_command { 'notify-service-by-email':
+    command_line => '/usr/bin/printf "%b" "***** Nagios *****\n\nNotification Type: $NOTIFICATIONTYPE$\n\nService: $SERVICEDESC$\nHost: $HOSTALIAS$\nState: $SERVICESTATE$\n\nDate/Time: $LONGDATETIME$\n\nAdditional Info:\n\n$SERVICEOUTPUT$\n" | /usr/bin/mail -s "** $NOTIFICATIONTYPE$ Service Alert: $HOSTALIAS$/$SERVICEDESC$ is $SERVICESTATE$ **" $CONTACTEMAIL$',
+    target       => '/etc/nagios/objects/commands.cfg',
+    notify       => Service['nagios'],
+    require      => Package['nagios']
   }
 }

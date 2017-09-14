@@ -1,40 +1,119 @@
+# Managed by Puppet
+
 global
-    log         127.0.0.1 local2
-    chroot      /var/lib/haproxy
-    pidfile     /var/run/haproxy.pid
-    user        haproxy
-    group       haproxy
-    daemon
-    stats socket /var/lib/haproxy/stats
+
+  log         127.0.0.1 local2
+  chroot      /var/lib/haproxy
+  pidfile     /var/run/haproxy.pid
+  user        haproxy
+  group       haproxy
+  daemon
+  stats socket /var/lib/haproxy/stats
+
 defaults
-    mode                    http
-    log                     global
-    option                  httplog
-    option                  dontlognull
-    option                  http-server-close
-    option                  redispatch
-    option                  forceclose
-    timeout http-keep-alive 10s
-    timeout check           10s
-    maxconn                 3000
+
+  mode                    http
+  log                     global
+  option                  httplog
+  option                  dontlognull
+  option                  http-server-close
+  option                  redispatch
+  option                  forceclose
+  timeout http-keep-alive 10s
+  timeout check           10s
+  maxconn                 3000
 <% if @lb_instances.length > 0 -%>
-<% @lb_instances.each do |name,config| -%>
+  <%- @lb_instances.each do |name,config| -%>
+
 listen <%= name %> *:<%= config['port'] %>
-    balance roundrobin
 
-<% if @sticky == true -%>
-    cookie JSESSIONID prefix
-    option httpchk GET  <%= config['healthcheck'] %>
-<% config['backends'].each do |backend| -%>
-    server <%= backend.split(':')[0] %> <%= backend %> cookie check
-<% end -%>
+  balance roundrobin
+    <%- # TCP CONFIGURATION -%>
+    <%- if config['mode'] == 'tcp' -%>
+  mode    tcp
+    <%- # REDIS CONFIGURATION -%>
+    <%- elsif config['mode'] == 'redis' -%>
+  mode    tcp
+  option  tcplog
+  option  redis-check
+      <%- if config['backends'].length > 1 -%>
+        <%-
+          # If more than one backend is configured we can assume Redis is
+          # clustered; we should therefore perform a check to see which node is
+          # assigned the master role.
+        -%>
+  option  tcp-check
+  <%- if config['redis_auth_password'] -%>
+  tcp-check send AUTH\ <%= config['redis_auth_password'] %>\r\n
+  tcp-check expect string +OK
+  <%- end -%>
+  tcp-check send PING\r\n
+  tcp-check expect string +PONG
+  tcp-check send info\ replication\r\n
+  tcp-check expect string role:master
+  tcp-check send QUIT\r\n
+  tcp-check expect string +OK
+      <%- end -%>
 
-<% else -%>
-    option httpchk GET <%=config['healthcheck'] %>
-<% config['backends'].each do |backend| -%>
-    server <%= backend.split(':')[0] %> <%= backend %> check
-<% end -%>
-<% end -%>
+  timeout connect  4s
+  timeout server   30s
+  timeout client   30s
+    <%- # HTTP CONFIGURATION -%>
+    <%- else -%>
+  mode    http
+  option  httpchk GET <%= config['healthcheck'] %>
+  option  forwardfor header X-Forwarded-For
 
-<% end -%>
+      <%-
+        # So that we can still identify the original source of HTTP requests
+        # certain headers need to be set on all HTTP requests that are proxied.
+      -%>
+  http-request set-header X-Client-IP %[src]
+  http-request set-header X-Real-IP %[req.hdr_ip(X-Forwarded-For,1)]
+      <%- if config['auth_group'] -%>
+  acl <%= config['auth_group'] %> http_auth(<%= config['auth_group'] %>)
+  http-request auth realm MyAuthRealm if !<%= config['auth_group'] %>
+      <%- end -%>
+      <%- if config['sticky'] == true -%>
+        <%-
+          # Sticky sessions are recorded in a client cookie called JSESSIONID.
+          # This is only used by stateful Java applications at the moment.
+        -%>
+
+  cookie JSESSIONID prefix
+      <%- end -%>
+    <%- end -%>
+
+  # Backends
+    <%- config['backends'].each do |backend| -%>
+      <%- if config['mode'] == 'tcp' -%>
+  server <%= backend.split(':')[0] %> <%= backend %> check inter 5s rise 2 fall 3
+      <%- else -%>
+  server <%= backend.split(':')[0] %> <%= backend %><% if config['sticky'] == true %> cookie<% end %> check<% if config.key?('healthcheck_port') %> port <%= config['healthcheck_port'] %><% end %>
+      <%- end -%>
+    <%- end -%>
+    <%- if config.key?('failover') -%>
+
+  # Failover backends
+      <%- config['failover'].each do |backend| -%>
+        <%- if config['mode'] == 'tcp' -%>
+  server <%= backend.split(':')[0] %> <%= backend %> backup check inter 5s rise 2 fall 3
+        <%- else -%>
+  server <%= backend.split(':')[0] %> <%= backend %> backup<% if config['sticky'] == true %> cookie<% end %> check<% if config.key?('healthcheck_port') %> port <%= config['healthcheck_port'] %><% end %>
+        <%- end -%>
+      <%- end -%>
+    <%- end -%>
+  <%- end -%>
+<%- end -%>
+
+<% if @auth_users -%>
+  <%- @auth_users.each do |group,users| -%>
+userlist <%= group %>
+
+  group AdminGroup users <% users.each do |name,password| -%><%=name%>,<% end %>
+
+    <%- users.each do |name,password| -%>
+  user <%=name%> password <%=password%>
+    <%- end -%>
+  <%- end -%>
 <% end -%>

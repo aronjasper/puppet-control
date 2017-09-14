@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# A simple nagios check for elasticserch backup status
+
+# Check that required commands are installed
+for command in jq; do
+  if ! type "${command}" > /dev/null 2>&1 ; then
+    echo >&2 "ERROR - You must have ${command} installed to run this check"
+    exit 3
+  fi
+done
+
+#set default state of backup variable
+backup=false
+
+# Check if a snapshot has been created for today
+# Get snapshot info
+json=$(curl -s -XGET "http://localhost/_snapshot/backups/_all")
+# debug only
+#echo -e "Output of snapshot info\n${json}"
+# return only snapshot end time
+json=$(echo $json | jq '.snapshots[] | "\(.end_time)"' | sed 's/"//g')
+# debug only
+#echo -e "Output of jq\n${json}"
+for line in $json; do
+  date=$(echo $line | cut -f 1 -d 'T')
+  # debug only
+  #echo "Time stamp(s) for existing snapshots ${date}"
+  if [[ $(date +%Y-%m-%d) == $date ]]; then
+    backup=true
+  fi
+done
+
+if [[ $backup == "true" ]]; then
+  echo "OK- backup exists for $(date +%Y-%m-%d)"
+  exit 0
+elif [[ $backup == "false"  ]]; then
+  echo "CRITICAL- no back up found for $(date +%Y-%m-%d)"
+  exit 2
+else
+  echo "UNKNOWN- $status"
+  exit 3
+fi

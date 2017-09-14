@@ -28,5 +28,10 @@ class profiles::nginx_selinux (
     ensure => 'present',
     source => 'puppet:///modules/profiles/nginx_name_connect.te'
   }
+  # Load SELinuux policy for NginX - Ports 5004 and 5005
+  selinux::module { 'nginx_rtp_media_port_t':
+    ensure => 'present',
+    source => 'puppet:///modules/profiles/nginx_rtp_media_port_t.te'
+  }
 
 }

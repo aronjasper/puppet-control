@@ -104,3 +104,4 @@ description = "Primary PostgreSQL Server"
 conninfo = "host=<%= @config_hostname %> user=barman dbname=postgres"
 ssh_command = "ssh postgres@<%= @config_hostname %>"
 retention_policy = <%= scope.function_hiera(['barman_retention_policy']) %>
+archiver = on

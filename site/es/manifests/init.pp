@@ -10,7 +10,8 @@ class es (
   $enable_backup = false,
   $backup_dir    = '/backups',
   $backup_hour   = '02',
-  $remote_fs     = false
+  $remote_fs     = false,
+  $cluster_servers = []
 ){
 
   include stdlib
@@ -33,7 +34,7 @@ class es (
   $data_dir      = "/var/lib/elasticsearch/${cluster_name}/data"
   $log_dir       = "/var/lib/elasticsearch/${cluster_name}/logs"
 
-  class { 'elasticsearch' :
+  class { 'elasticsearch_old' :
     ensure       => present,
     manage_repo  => true,
     package_pin  => true,
@@ -42,11 +43,11 @@ class es (
     version      => $version
   }
 
-  elasticsearch::plugin { 'royrusso/elasticsearch-HQ' :
+  elasticsearch_old::plugin { 'royrusso/elasticsearch-HQ' :
     instances => $cluster_name
   }
 
-  elasticsearch::instance { $cluster_name :
+  elasticsearch_old::instance { $cluster_name :
     datadir       => $data_dir,
     init_defaults => {
       'ES_HEAP_SIZE' => $heap_size
@@ -77,7 +78,8 @@ class es (
       'discovery.zen' => {
         'minimum_master_nodes' => 1,
         'ping'                 => {
-          'multicast.enabled' => true
+          'multicast.enabled' => false,
+          'unicast.hosts'     => $cluster_servers
         }
       }
     }

@@ -13,7 +13,7 @@ Rake::Task[:lint].clear # https://github.com/rodjek/puppet-lint/issues/331
 PuppetLint::RakeTask.new :lint do |config|
   config.fail_on_warnings = true
   config.ignore_paths = exclude_paths
-  config.disable_checks = ['80chars']
+  config.disable_checks = ['80chars', 'autoloader_layout', 'nested_classes_or_defines', 'documentation']
   config.log_format = "%{path}:%{linenumber}:%{check}:%{KIND}:%{message}"
 end
 

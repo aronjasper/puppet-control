@@ -1,5 +1,5 @@
-vrrp_script haproxy {
-  script "pgrep haproxy"
+vrrp_script <%= @track_script_name %> {
+  script "<%= @track_script_cmd %>"
   interval 1
   wait 1
 }
@@ -13,6 +13,6 @@ vrrp_instance <%= @fqdn %> {
         <%= @virtual_ip %>
     }
     track_script {
-      haproxy
+      <%= @track_script_name %>
     }
 }

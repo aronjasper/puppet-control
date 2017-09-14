@@ -18,10 +18,12 @@ class profiles::postgresqlha_standby (
   $shortversion = regsubst($version, '\.', '')
   $custom_hosts = template('profiles/postgres_hostfile_generation.erb')
 
-  if has_key($postgres_conf, 'wal_keep_segments') {
-    $wal_keep_segments = "-w ${postgres_conf[wal_keep_segments]}"
-  } else {
-    $wal_keep_segments = ''
+  if $postgres_conf {
+    if has_key($postgres_conf, 'wal_keep_segments') {
+      $wal_keep_segments = "-w ${postgres_conf[wal_keep_segments]}"
+    } else {
+      $wal_keep_segments = ''
+    }
   }
 
   selinux::module { 'keepalivedlr':
@@ -82,7 +84,7 @@ class profiles::postgresqlha_standby (
     } ->
 
     exec { "get_postgres_${shortversion}" :
-      command => "yum localinstall http://yum.postgresql.org/${version}/redhat/rhel-6-x86_64/pgdg-centos${shortversion}-${version}-1.noarch.rpm -y",
+      command => "yum localinstall http://yum.postgresql.org/${version}/redhat/rhel-6-x86_64/pgdg-centos${shortversion}-${version}-3.noarch.rpm -y",
       user    => 'root',
       before  => Package["postgresql${shortversion}-server"]
     } ->
@@ -198,11 +200,22 @@ class profiles::postgresqlha_standby (
       mode    => '0600',
     } ->
 
+    exec { 'set_system_keepalive' :
+      command => 'sysctl -w net.ipv4.tcp_keepalive_time=60',
+      user    => 'root',
+    } ->
+
     exec { 'clone_database_master' :
-      command => "/usr/pgsql-${version}/bin/repmgr -r -F -D /var/lib/pgsql/${version}/data/ -d repmgr -U repmgr ${wal_keep_segments} --verbose standby clone ${vip_hostname}",
+      command => "/usr/pgsql-${version}/bin/repmgr -c -F -f /etc/repmgr/${version}/repmgr.conf ${::wal_keep_segments} -D /var/lib/pgsql/${version}/data/ -d repmgr -U repmgr --verbose standby clone ${vip_hostname}",
       user    => 'postgres',
       cwd     => "/etc/repmgr/${version}/",
+      timeout => '0',
       unless  => 'psql -c "select pg_is_in_recovery();" | grep "^ t$"',
+    } ->
+
+    exec { 'reset_system_keepalive' :
+      command => 'sysctl -w net.ipv4.tcp_keepalive_time=7200',
+      user    => 'root',
     } ->
 
     service { "postgresql-${version}" :
@@ -217,7 +230,7 @@ class profiles::postgresqlha_standby (
     } ->
     # added sleep before next command as on ESX repmanager tries to start before the postgres database is up.
     exec { 'standby_register_repmgrd' :
-      command => "sleep 10 ; /usr/pgsql-${version}/bin/repmgr -f /etc/repmgr/${version}/repmgr.conf standby register --force",
+      command => "sleep 30 ; /usr/pgsql-${version}/bin/repmgr -f /etc/repmgr/${version}/repmgr.conf standby register --force",
       user    => 'postgres',
       require => File['/var/lib/pgsql/.pgpass'],
       unless  => "/usr/pgsql-${version}/bin/repmgr -f /etc/repmgr/${version}/repmgr.conf cluster show | grep \"standby | host=${::hostname}\"",

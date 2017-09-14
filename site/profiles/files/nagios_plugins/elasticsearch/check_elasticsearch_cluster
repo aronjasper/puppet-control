@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# A simple nagios check for elasticserch cluster status
+
+status=$(curl -s 'http://localhost:9200/_cluster/health?pretty=true' | grep status)
+
+if [[ $status == '  "status" : "green",' ]]; then
+  echo "OK- $status"
+  exit 0
+elif [[ $status == '  "status" : "yellow",' ]]; then
+  echo "CRITICAL- $status"
+  exit 2
+elif [[ $status == '  "status" : "red",' ]]; then
+  echo "CRITICAL- $status"
+  exit 2
+else
+  echo "UNKNOWN- $status"
+  exit 3
+fi

@@ -1,0 +1,3 @@
+Defaults:postgres !requiretty
+postgres ALL = NOPASSWD: /usr/bin/systemctl *, \
+   /usr/pgsql-<%= @version %>/bin/pg_ctl *

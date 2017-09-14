@@ -4,70 +4,58 @@ classes:
   - 'profiles::jenkins'
   - 'profiles::ansible'
 
-profiles::jenkins::plugins:
-  git:
-    version: 2.4.0
-  credentials:
-    version: 1.23
-  git-client:
-    version: 1.19.0
-  scm-api:
-    version: 0.2
-  matrix-project:
-    version: 1.4.1
-  token-macro:
-    version: 1.10
-  ssh-credentials:
-    version: 1.11
-  mailer:
-    version: 1.15
+jenkins_plugins:
   active-directory:
     version: 1.41
-  scm-sync-configuration:
-    version: 0.0.8
-  subversion:
-    version: 1.54
   analysis-core:
     version: 1.72
-  tasks:
-    version: 4.45
+  ansicolor:
+    version: 0.4.1
+  build-monitor-plugin:
+    version: 1.6+build.142
+  cobertura:
+    version: 1.9.7
+  git:
+    version: 2.4.0
+  git-client:
+    version: 1.19.0
+  github:
+    version: 1.13.3
+  github-api:
+    version: 1.69
+  github-oauth:
+    version: 0.22.2
   mapdb-api:
     version: 1.0.6.0
+  Parameterized-Remote-Trigger:
+    version: 2.2.2
+  parameterized-trigger:
+    version: 2.29
+  plain-credentials:
+    version: 1.1
+  pyenv:
+    version: 0.0.7
+  rbenv:
+    version: 0.0.16
+  role-strategy:
+    version: 2.2.0
   ruby-runtime:
     version: 0.12
     timeout: 240
-  rbenv:
-    version: 0.0.16
-  ansicolor:
-    version: 0.4.1
+  scm-api:
+    version: 0.2
   scm-sync-configuration:
     version: 0.0.8
-  role-strategy:
-    version: 2.2.0
-  github-api:
-    version: 1.69
-  plain-credentials:
-    version: 1.1
-  github:
-    version: 1.13.3
-  xunit:
-    version: 1.97
-  cobertura:
-    version: 1.9.7
-  pyenv:
-    version: 0.0.7
-  github-oauth:
-    version: 0.22.2
-  build-monitor-plugin:
-    version: 1.6+build.142
-  parameterized-trigger:
-    version: 2.29
+  tasks:
+    version: 4.45
+  text-finder:
+    version: '1.10'
+  token-macro:
+    version: '1.10'
   urltrigger:
     version: 0.41
-  Parameterized-Remote-Trigger:
-    version: 2.2.2
-  text-finder:
-    version: 1.10
+  xunit:
+    version: 1.97
 
 
 profiles::jenkins::jenkins_ssl: true

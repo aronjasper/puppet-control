@@ -19,8 +19,9 @@
 #
 class profiles::jenkins (
 
-  $plugins                 = undef,
+  $plugins                 = hiera_hash('jenkins_plugins', false),
   $jobs                    = undef,
+  $repo                    = undef,
   $deploy_from_jenkins_rsa = undef,
   $version                 = '1.651-1.1',
   $phantomjs_version       = '1.9.8',
@@ -107,6 +108,7 @@ class profiles::jenkins (
     configure_firewall => false,
     job_hash           => $jobs,
     version            => $version,
+    repo               => hiera('jenkins_manage_repo', true),
   }
 
   file { '/var/lib/jenkins/.ssh':
@@ -199,7 +201,7 @@ class profiles::jenkins (
     ensure_packages(['libcurl-devel', 'patch', 'libxml2-devel',
       'libxslt-devel', 'gcc', 'ruby-devel', 'zlib-devel', 'postgresql-devel',
       'openssl-devel', 'readline-devel', 'libffi-devel', 'gcc-c++',
-      'libjpeg-turbo-devel', 'zlib-devel'])
+      'libjpeg-turbo-devel', 'zlib-devel', 'bzip2-devel'])
 
   }
 

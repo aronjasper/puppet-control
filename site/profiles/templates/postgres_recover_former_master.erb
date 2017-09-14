@@ -1,0 +1,72 @@
+#!/bin/bash
+
+################################################################################
+# This script invokes the pg_rewind command to recover a failed master node and
+# reinstate it as a standby following the newly promoted master and is used after
+# a failure of the master node and the subsequent failover.
+################################################################################
+
+# Check if the new master is available via the vip_ip
+# if not bail out recommending remedial action on the master
+
+BARMAN_HOSTNAME=<%= @barman_hostname %>
+VIP_HOSTNAME=<%= @vip_hostname -%>
+VERSION=<%= @version -%>
+
+if [ $(ping -c1 vip 1> /dev/null 2>/dev/null ; echo $? ) -ne 0 ] ; then
+  echo 'Could not contact the master server via the vip.'
+  echo 'check that the vip (${VIP_HOSTNAME}) is being assigned on the master.'
+  exit 1
+fi
+
+# Stop keepalived and repmgr
+systemctl stop repmgr keepalived postgresql-${VERSION}
+
+# Attempt to use pg_rewind to recover server
+su - postgres -c "pg_rewind --target-pgdata=/var/lib/pgsql/${VERSION}/data/\
+ --source-server='host=${VIP_HOSTNAME} user=barman dbname=postgres'"
+
+# Correct recovery.conf
+NODE_NUMBER=$(sed -n 's/^node=// p' /etc/repmgr/${VERSION}/repmgr.conf)
+NODE_NAME=$(sed -n 's/^node_name=// p' /etc/repmgr/${VERSION}/repmgr.conf)
+
+rm -f /var/lib/pgsql/${VERSION}/data/recovery.*
+
+cat > /var/lib/pgsql/${VERSION}/data/recovery.conf << EOF
+standby_mode = 'on'
+primary_conninfo = 'user=repmgr port=5432 sslmode=prefer sslcompression=1\
+ krbsrvname=postgres host=${VIP_HOSTNAME} application_name=${NODE_NAME}\
+ password=repmgr connect_timeout=2'
+recovery_target_timeline = 'latest'
+primary_slot_name = repmgr_slot_${NODE_NUMBER}
+EOF
+
+chown postgres:postgres /var/lib/pgsql/${VERSION}/data/recovery.conf
+chmod 600 /var/lib/pgsql/${VERSION}/data/recovery.conf
+
+# Create a replcation slot for this node on the new master if necessary
+x=$(su - postgres -c 'psql -U barman -h vip -d postgres -t -c "select slot_name from pg_replication_slots where slot_name = '\''''repmgr_slot_'${NODE_NUMBER}''\''''"')y
+if [ ${x} == 'y' ] ; then
+  su - postgres -c 'psql -U barman -h vip -d postgres -c "select pg_create_physical_replication_slot('\'repmgr_slot_${NODE_NUMBER}\'')"' > /dev/null 2>&1
+  echo Replication slot \'repmgr_slot_${NODE_NUMBER}\' has been created.
+else
+  echo Replication slot \'repmgr_slot_${NODE_NUMBER}\' already exists, moving on.
+fi
+
+# Create a replcation slot for the barman server on the new master if necessary
+x=$(su - postgres -c 'psql -U barman -h vip -d postgres -t -c "select slot_name from pg_replication_slots where slot_name = '\''''barman'\''''"')y
+
+if [ ${x} == 'y' ] ; then
+  su - postgres -c "ssh barman@${BARMAN_HOSTNAME} '/usr/bin/barman receive-wal --create-slot primary; sleep 5; /usr/bin/barman cron; /usr/bin/barman check primary'"
+else
+  su - postgres -c "ssh barman@${BARMAN_HOSTNAME} '/usr/bin/barman cron; /usr/bin/barman check primary'"
+fi
+
+# Start postgres
+systemctl start postgresql-<%= @version -%>
+
+# Register this node as a slave
+su - postgres -c "repmgr -f /etc/repmgr/${VERSION}/repmgr.conf standby register --force"
+
+# Start keepalived and repmgr
+systemctl start repmgr keepalived

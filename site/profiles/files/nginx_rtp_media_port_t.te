@@ -1,0 +1,13 @@
+
+module nginx_rtp_media_port_t 1.0;
+
+require {
+	type httpd_t;
+	type rtp_media_port_t;
+	class tcp_socket name_connect;
+}
+
+#============= httpd_t ==============
+
+#!!!! This avc can be allowed using the boolean 'httpd_can_network_connect'
+allow httpd_t rtp_media_port_t:tcp_socket name_connect;

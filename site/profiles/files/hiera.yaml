@@ -4,11 +4,13 @@
 :yaml:
   :datadir: /etc/puppet/environments/%{environment}/hiera
 :hierarchy:
+  - secrets/nodes/%{::fqdn}
   - secrets/network_location/%{::network_location}/%{::application_environment}
   - secrets/network_location/%{::network_location}/common
-  - secrets/nodes/%{::fqdn}
-  - secrets/cluster/%{::server_type}
+  - secrets/service/%{::service}/%{::application_environment}/%{::server_type}
   - secrets/types/%{::server_type}
+  - secrets/service/%{::service}/%{::application_environment}/common
+  - secrets/service/%{::service}/common
   - secrets/application_environment/%{::application_environment}
   - secrets/secrets
   - application_environment/%{::application_environment}

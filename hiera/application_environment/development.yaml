@@ -1,9 +1,7 @@
 ---
-
+profiles::postgres_ha::version: '9.6'
+profiles::postgres_ha_barman::version: '9.6'
 profiles::nagios_client::nagios_server: 192.16.42.47
-
-repmgr_password: repmgr
-barman_password: barman
 
 postgresqlha_keys:
   public: |

@@ -1,1 +1,2 @@
+*:5432:*:repmgr:<%= scope.function_hiera(['repmgr_password']) %>
 *:5432:*:barman:<%= scope.function_hiera(['barman_password']) %>

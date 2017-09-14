@@ -1,0 +1,93 @@
+#!/bin/bash
+
+################################################################################
+# This script invokes the repmgr standby switchover command to swap a standby
+# node with the primarily node and is used for scheduled maintenance purposes.
+# It orchestrates activities across all the nodes to esure the integrity of the
+# cluster after the switchover.
+################################################################################
+
+PG_VERSION=<%= @version %>
+BARMAN_HOSTNAME=<%= @barman_hostname %>
+
+if ! systemctl status postgresql-${PG_VERSION} > /dev/null 2> /dev/null ; then
+  echo -e "\nThe Postgres service isn't curretly running on the node and so it can't be promoted to a master,"
+  echo -e "please start the Postgres service and try again or run this script on a working standby.\n"
+  exit
+fi
+
+CLUSTER_NODES=$(su - postgres -c "/usr/pgsql-${PG_VERSION}/bin/repmgr -f /etc/repmgr/${PG_VERSION}/repmgr.conf cluster show | grep host" 2> /dev/null )
+
+set -f
+
+MASTER_LINE=$(grep '* master' <<< "${CLUSTER_NODES}")
+MASTER_HOST=$(sed 's/.*host=\(.*\) user=.*/\1/' <<< "${MASTER_LINE}")
+THIS_HOST=$(hostname)
+
+if [ $(hostname) == "${MASTER_HOST}" ] ; then
+  echo -e "\nThis is the current "Master Node", the "standby promote" command can only be run form a working standby,"
+  echo -e "please run this script from one of the current standby nodes instead.\n"
+  exit
+fi
+
+### Check for failed cluster nodes and issue warning if there are any
+if grep -q 'FAILED' <<< "${CLUSTER_NODES}" ; then
+  echo -e "\n${CLUSTER_NODES}\n"
+  echo -e "\nAt least one of the servers is currently in a failed state, are you sure you want to continue?\n"
+  read RESPONSE
+  if [ $( tr [:lower:] [:upper:] <<< "${RESPONSE}X" ) ==  'YX' ] ; then
+    ### Remove any falied nodes from the list of servers
+    CLUSTER_NODES=$(grep -v 'FAILED' <<< "${CLUSTER_NODES}")
+    echo -e "\n Remenber, you will need to address the issues with the failed server and re-introduce it into"
+    echo -e "the cluster after the switchover has completed./n"
+  else
+    exit
+  fi
+fi
+
+VIABLE_STANDBY_HOSTS=$(egrep -v "${MASTER_HOST}|${THIS_HOST}" <<< "${CLUSTER_NODES}" | sed 's/.*host=\(.*\) user=.*/\1/')
+ALL_HOSTS="${MASTER_HOST} ${THIS_HOST} ${VIABLE_STANDBY_HOSTS}"
+
+
+echo -e '\nPress enter to continue and stop the repmgr service on all nodes\n'
+read
+
+for HOST in ${ALL_HOSTS} ; do
+  echo Stopping repmgr service: ${HOST}
+  su - postgres -c "ssh ${HOST} 'sudo systemctl stop repmgr'"
+done
+
+echo -e '\nPress enter to continue and initiate standby switchover\n'
+read
+
+echo Initiating standby switchover from ${MASTER_HOST} and promiting this node to be the new MASTER
+su - postgres -c "/usr/pgsql-${PG_VERSION}/bin/repmgr -f /etc/repmgr/${PG_VERSION}/repmgr.conf standby switchover"
+
+echo -e '\nPress enter to continue and re-register any alternative standby nodes\n'
+read
+
+for HOST in ${VIABLE_STANDBY_HOSTS} ; do
+  echo Force standby re-register: ${HOST}
+  su - postgres -c "ssh ${HOST} '/usr/pgsql-${PG_VERSION}/bin/repmgr -f /etc/repmgr/${PG_VERSION}/repmgr.conf standby register --force'"
+done
+
+echo -e '\nPress enter to continue and restart the repmgr service on all nodes\n'
+read
+
+for HOST in ${ALL_HOSTS} ; do
+  echo Starting repmgr service: ${HOST}
+  su - postgres -c "ssh ${HOST} 'sudo systemctl start repmgr'"
+done
+
+echo -e '\nPress enter to continue to refresh and check barman on the barman server\n'
+read
+
+x=$(su - postgres -c 'psql -U barman -h vip -d postgres -t -c "select slot_name from pg_replication_slots where slot_name = '\''''barman'\''''"')y
+
+if [ ${x} == 'y' ] ; then
+  su - postgres -c "ssh barman@${BARMAN_HOSTNAME} '/usr/bin/barman receive-wal --create-slot primary; sleep 5; /usr/bin/barman cron; /usr/bin/barman check primary'"
+else
+  su - postgres -c "ssh barman@${BARMAN_HOSTNAME} '/usr/bin/barman cron; /usr/bin/barman check primary'"
+fi
+
+set +f
