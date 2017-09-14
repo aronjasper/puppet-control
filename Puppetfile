@@ -86,7 +86,7 @@ mod 'pulp',                            :git => 'https://github.com/LandRegistry-
 mod 'cpan',                            :git => 'https://github.com/meltwater/puppet-cpan',
                                        :ref => '14ec4ac9850bcc55d6cc5bad52a7fe9ce3745c32'
 mod 'lrtomcat',                        :git => 'https://github.com/LandRegistry-Ops/puppet-tomcat.git',
-                                       :ref => '0.2.3'
+                                       :ref => '0.2.4'
 mod 'wildfly',                         :git => 'https://github.com/biemond/biemond-wildfly.git',
                                        :ref => 'v1.2.8'
 
