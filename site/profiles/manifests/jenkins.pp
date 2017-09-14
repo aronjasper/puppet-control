@@ -31,8 +31,8 @@ class profiles::jenkins (
   $ssl_ciphers             = 'RC4:HIGH:!aNULL:MD5:@STRENGTH',
   $ssl_crt                 = '',
   $ssl_key                 = '',
-  $ci_test_tools           = false
-
+  $ci_test_tools           = false,
+  $g10k_version            = '0.3.12',
   ){
 
   # HTTPS redirect / proxy
@@ -138,6 +138,15 @@ class profiles::jenkins (
   }
 
   # ensure artifact script is installed
+  file { '/usr/bin/artifact2':
+    ensure => present,
+    path   => '/usr/local/bin/artifact2',
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0755',
+    source => 'puppet:///modules/profiles/artifact2.sh'
+  }
+
   file { '/usr/bin/deploy':
     ensure => present,
     path   => '/usr/local/bin/deploy',
@@ -145,6 +154,15 @@ class profiles::jenkins (
     group  => 'root',
     mode   => '0755',
     source => 'puppet:///modules/profiles/deploy.sh'
+  }
+
+  file { '/usr/bin/deploy2':
+    ensure => present,
+    path   => '/usr/local/bin/deploy2',
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0755',
+    source => 'puppet:///modules/profiles/deploy2.sh'
   }
 
   # ensure app-deploy script is installed
@@ -182,6 +200,30 @@ class profiles::jenkins (
     ensure   => 'installed',
     provider => 'gem',
   }
+
+  archive {"g10k-${g10k_version}":
+    ensure           => present,
+    url              => "https://github.com/xorpaul/g10k/releases/download/v${g10k_version}/g10k-linux-amd64.zip",
+    target           => "/opt/g10k/g10k-${g10k_version}",
+    root_dir         => '.',
+    checksum         => false,
+    follow_redirects => true,
+    extension        => 'zip',
+    src_target       => '/opt',
+    before           => File["/opt/g10k/g10k-${g10k_version}/g10k"],
+  }
+
+  file {"/opt/g10k/g10k-${g10k_version}/g10k":
+    ensure => present,
+    mode   => '0755',
+  }
+
+  file {'/usr/local/bin/g10k':
+    ensure  => 'link',
+    target  => "/opt/g10k/g10k-${g10k_version}/g10k",
+    require => File["/opt/g10k/g10k-${g10k_version}/g10k"]
+  }
+
 
   if $ci_test_tools == true {
 
