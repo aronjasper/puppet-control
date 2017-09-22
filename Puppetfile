@@ -89,6 +89,8 @@ mod 'lrtomcat',                        :git => 'https://github.com/LandRegistry-
                                        :ref => '0.2.4'
 mod 'wildfly',                         :git => 'https://github.com/biemond/biemond-wildfly.git',
                                        :ref => 'v1.2.8'
+mod 'yumlock',                         :git => 'https://github.com/LandRegistry-Ops/puppet-yumlock',
+                                       :ref => '97ec845e5fd993fec7122e23ff63362a194fa4de'
 
 
 # Dependency modules
