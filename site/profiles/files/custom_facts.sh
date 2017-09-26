@@ -19,16 +19,14 @@ for d in /opt/landregistry/applications/*/lr-*.service ; do
     SERVICE_HEALTH=''
     if [ -f $APP_PATH/startup.sh ]; then
       SERVICE_PORT=$(cat $APP_PATH/startup.sh | grep "export PORT" | tr -dc '0-9')
-      SERVICE_HEALTH=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 http://localhost:$SERVICE_PORT/health)
+      if [ "$SERVICE_PORT" != "0" ]; then
+        SERVICE_HEALTH=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 http://localhost:$SERVICE_PORT/health)
+      fi
     fi
-    SERVICE_STATUS=''
-    if [ -f $APP_PATH/lr-$APP_NAME.service ]; then
-      SERVICE_STATUS=$(sudo systemctl | grep ${SERVICE_NAME} | awk '{print $4;}')
-    fi
+    SERVICE_STATUS=$(sudo systemctl | grep ${SERVICE_NAME} | awk '{print $4;}')
     if [ -f $APP_PATH/COMMIT ]; then
       CURRENT_COMMIT=$(cat $APP_PATH/COMMIT)
     fi
-
     APP_STATUS=$(echo $APP_STATUS "\"$APP_NAME\": {\"port\": \"${SERVICE_PORT}\", \"application_health\": \"${SERVICE_HEALTH}\", \"service_health\": \"${SERVICE_STATUS}\", \"current_commit\": \"${CURRENT_COMMIT}\"}," )
 done
 APP_STATUS=$(echo $APP_STATUS | sed 's/\(.*\),/\1 /')
