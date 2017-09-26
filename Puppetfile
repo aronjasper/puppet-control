@@ -13,7 +13,7 @@ mod 'jfryman/selinux',                 '0.4.0'
 mod 'gradle',                          :git => 'https://github.com/LandRegistry-Ops/puppet-gradle.git',
                                        :ref => '1.1.0'
 mod 'wsgi',                            :git => 'https://github.com/LandRegistry-Ops/puppet-wsgi.git',
-                                       :ref => '1.4.2'
+                                       :ref => '1.4.3'
 mod 'leinaddm/htpasswd',               '0.0.3'
 mod 'maestrodev/wget',                 '1.7.3'
 mod 'pip',                             :git => 'https://github.com/openstack-infra/puppet-pip.git',
@@ -74,9 +74,9 @@ mod 'opendj',                          :git => 'https://github.com/LandRegistry-
 mod 'openresty',                       :git => 'https://github.com/LandRegistry-Ops/puppet-openresty.git',
                                        :ref => '5c073c509ff9405e27c39f93c1154412c530ac39'
 mod 'static_content',                  :git => 'https://github.com/LandRegistry/puppet-openresty-static-content.git',
-                                       :ref => '674d20de098df61ad7b08437a54496de67ce56c2'
+                                       :ref => 'ea527964d49a539731a2725f9f5d3d4e86ebf2ba'
 mod 'geoserver',                       :git => 'https://github.com/LandRegistry-Ops/puppet-geoserver.git',
-                                       :ref => '9f4cff7c6388beb56884ef641181960424e1a596'
+                                       :ref => '22c0f84b98bc4109cf18f662df8f711d08580012'
 mod 'mailhog',                         :git => 'https://github.com/LandRegistry-Ops/attachmentgenie-mailhog.git',
                                        :ref => '2ff9711bed8df2aba1047eb401f0f8dae8c9f64d'
 mod 'redis',                           :git => 'https://github.com/LandRegistry-Ops/puppet-redis.git',
