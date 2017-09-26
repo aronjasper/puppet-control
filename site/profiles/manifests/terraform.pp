@@ -3,9 +3,9 @@ class profiles::terraform(
   ){
 
   exec { 'terraform':
-    command => "wget https://releases.hashicorp.com/terraform/${version}/terraform_${version}_linux_amd64.zip -P /tmp/",
-    user    => 'root',
-    notify  => Exec['unzip'],
+    command     => "wget https://releases.hashicorp.com/terraform/${version}/terraform_${version}_linux_amd64.zip -P /tmp/",
+    user        => 'root',
+    notify      => Exec['unzip'],
     refreshonly => true,
   }
 
@@ -16,8 +16,8 @@ class profiles::terraform(
   }
 
   file { '/bin/terraform' :
-    require => Exec['unzip'],
     ensure  => file,
+    require => Exec['unzip'],
     owner   => root,
     group   => root,
     mode    => '0755'
