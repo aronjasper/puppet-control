@@ -3,6 +3,9 @@
 classes:
   - 'profiles::jenkins'
   - 'profiles::ansible'
+  - 'profiles::terraform'
+
+profiles::terraform::version: '0.8.8'
 
 jenkins_plugins:
   active-directory:
