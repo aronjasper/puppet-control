@@ -17,6 +17,7 @@ group { 'lr-admin' :
 }
 
 # Create 'lr-readonly' group on all hosts
+group { 'lr-readonly' : ensure => present }
 
 # Configure password sudo + not tty for deployment
 sudo::conf { 'deployment' :
