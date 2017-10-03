@@ -16,7 +16,9 @@ group { 'lr-admin' :
   gid    => 2000
 }
 
-# Configure passwor sudo + not tty for deployment
+# Create 'lr-readonly' group on all hosts
+
+# Configure password sudo + not tty for deployment
 sudo::conf { 'deployment' :
   priority => 10,
   content  => 'Defaults: %deployment !requiretty
