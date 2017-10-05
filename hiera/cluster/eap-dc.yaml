@@ -1,0 +1,295 @@
+---
+classes:
+  - profiles::packages
+  - profiles::eap_dc
+
+wildfly::repository_source: 'http://192.168.99.2'
+wildfly::install_source: 'http://192.168.99.2/jboss-eap-7.1.0.Beta.tar.gz'
+
+wildfly::mgmt_user:
+  'username': 'slave'
+  'password': 'passw0rd!'
+
+wildfly::dc_server_groups:
+  'backend_cluster_server_group':
+    config:
+      profile: 'full-ha'
+      socket-binding-group: 'full-ha-sockets'
+  'frontend_lb_server_group':
+    config:
+      profile: 'ha'
+      socket-binding-group: 'ha-sockets'
+# wildfly::servers:
+#    '/host=server2/server-config=slave1_server2':
+#      content:
+#        'group':  'backend_cluster_server_group'
+#        'socket-binding-port-offset': 10
+#    '/host=server3/server-config=slave1_server3':
+#      content:
+#        'socket-binding-port-offset': 10
+#        'group':  'frontend_lb_server_group'
+#    '/host=server4/server-config=slave1_server4':
+#      content:
+#        'group':  'backend_cluster_server_group'
+#        'socket-binding-port-offset': 10
+#
+# wildfly::mod_cluster_config:
+#   '/profile=full-ha/subsystem=modcluster/mod-cluster-config=configuration':
+#     'recursive': true
+#     content:
+#         'advertise-security-key': secret
+#
+# wildfly::undertow_config:
+#   '/profile=ha/subsystem=undertow/configuration=filter/mod-cluster=modcluster':
+#     'recursive': true
+#     content:
+#       'management-socket-binding': http
+#       'advertise-socket-binding': modcluster
+#       'security-key': secret
+#
+# wildfly::default_undertow:
+#   '/profile=ha/subsystem=undertow/server=default-server/host=default-host/filter-ref=modcluster':
+#     'ensure': present
+#
+# wildfly::deployment:
+#   'cluster-demo.war':
+#     'source': 'http://192.168.50.14/cluster-demo.war'
+#     'server_group': 'backend_cluster_server_group'
+#
+# wildfly::driver_reg:
+#   'ibmdb2':
+#     'driver_name': 'ibm'
+#     'driver_module_name': 'com.ibm'
+#     'driver_xa_datasource_class_name': 'com.ibm.db2.jcc.DB2XADataSource'
+#     'target_profile': 'full-ha'
+#   'oracle':
+#     'driver_name': 'oracle'
+#     'driver_module_name': 'com.oracle'
+#     'driver_xa_datasource_class_name': 'oracle.jdbc.xa.client.OracleXADataSource'
+#     'target_profile': 'full-ha'
+#
+# wildfly::datasources:
+#   'DB2XADS':
+#     config:
+#       'jndi-name': 'java:/DB2XADS'
+#       'enabled': true
+#       'statistics-enabled': true
+#       'driver-name': ibmdb2
+#       'transaction-isolation': TRANSACTION_READ_COMMITTED
+#       'user-name': 'username'
+#       'password': 'password'
+#       'recovery-username': username
+#       'recovery-password': password
+#       'valid-connection-checker-class-name': 'org.jboss.jca.adapters.jdbc.extensions.db2.DB2ValidConnectionChecker'
+#       'check-valid-connection-sql': 'select 1 from sysibm.sysdummy1'
+#       'validate-on-match': false
+#       'background-validation-millis': 59000
+#       'stale-connection-checker-class-name': 'org.jboss.jca.adapters.jdbc.extensions.db2.DB2StaleConnectionChecker'
+#       'exception-sorter-class-name': 'org.jboss.jca.adapters.jdbc.extensions.db2.DB2ExceptionSorter'
+#       'track-statements': true
+#       'min-pool-size': 1
+#       'max-pool-size': 50
+#       'pool-prefill': false
+#       'xa-datasource-properties':
+#          'ServerName':
+#            'value': server1
+#          'PortNumber':
+#            'value': 2298
+#          'User':
+#            'value': username
+#          'DriverType':
+#            'value': 4
+#          'Password':
+#            'value': password
+#          'currentPackageSet':
+#            'value': SYST
+#          'currentSchema':
+#            'value': SYST
+#          'securityMechanism':
+#            'value': 3
+#          'maxStatements':
+#            'value': 500
+#          'currentFunctionPath':
+#            'value': SYST
+#          'DatabaseName':
+#            'value': databasename
+#     'target_profile': 'full-ha'
+#   'edwDatasource':
+#     config:
+#       'jndi-name': 'java:/edwDatasource'
+#       'enabled': true
+#       'driver-name': 'oracle'
+#       'min-pool-size': 1
+#       'max-pool-size': 10
+#       'pool-prefill': true
+#       'same-rm-override': false
+#       'security-domain': 'encrypted-oov-edwds'
+#       'validate-on-match': true
+#       'background-validation': false
+#       'valid-connection-checker-class-name': 'org.jboss.jca.adapters.jdbc.extensions.oracle.OracleValidConnectionChecker'
+#       'stale-connection-checker-class-name': 'org.jboss.jca.adapters.jdbc.extensions.oracle.OracleStaleConnectionChecker'
+#       'exception-sorter-class-name': 'org.jboss.jca.adapters.jdbc.extensions.oracle.OracleExceptionSorter'
+#       'xa-datasource-properties':
+#         'URL':
+#           'value': 'jdbc:oracle:thin:@//hostname:1521/test1'
+#     'target_profile': 'full-ha'
+#   'edwFloodRisk':
+#     config:
+#       'jndi-name': 'java:/edwFloodRisk'
+#       'enabled': true
+#       'driver-name': 'oracle'
+#       'min-pool-size': 1
+#       'max-pool-size': 10
+#       'pool-prefill': true
+#       'same-rm-override': false
+#       'security-domain': 'encrypted-oov-edwds'
+#       'validate-on-match': true
+#       'background-validation': false
+#       'valid-connection-checker-class-name': 'org.jboss.jca.adapters.jdbc.extensions.oracle.OracleValidConnectionChecker'
+#       'stale-connection-checker-class-name': 'org.jboss.jca.adapters.jdbc.extensions.oracle.OracleStaleConnectionChecker'
+#       'exception-sorter-class-name': 'org.jboss.jca.adapters.jdbc.extensions.oracle.OracleExceptionSorter'
+#       'xa-datasource-properties':
+#         'URL':
+#           'value': 'jdbc:oracle:thin:@//hostname:1521/test2'
+#     'target_profile': 'full-ha'
+#
+# wildfly::naming:
+#    '/profile=full-ha/subsystem=naming/binding="java:/db_qualifier2"':
+#     content:
+#          'binding-type': 'simple'
+#          'value': 'syst.'
+#    '/profile=full-ha/subsystem=naming/binding="java:/sp_qualifier"':
+#     content:
+#          'binding-type': 'simple'
+#          'value': 'prov.'
+#    '/profile=full-ha/subsystem=naming/binding="java:/fonts_path"':
+#     content:
+#          'binding-type': 'simple'
+#          'value': '/opt/jboss-eap/fonts'
+#
+# wildfly::system-properties:
+#    '/system-property=MQ.hostName':
+#     content:
+#       'value': 00.00.00.00
+#    '/system-property=MQ.port':
+#     content:
+#       'value': 0000
+#    '/system-property=MQ.queueManager':
+#     content:
+#       'value': X1B1
+#    '/system-property=MQ.channel':
+#     content:
+#       'value': SYSTEM.XXX.XXX
+#    '/system-property=MQ.transportType':
+#     content:
+#       'value': CLIENT
+#    '/system-property=MQ.username':
+#     content:
+#      'value': username
+#
+# wildfly::resource_adapters:
+#   '/profile=full-ha/subsystem=resource-adapters/resource-adapter=wmq.jmsra.rar':
+#    content:
+#      'archive': 'wmq.jmsra.rar'
+#      'transaction-support': 'XATransaction'
+# #config-properties
+#   '/profile=full-ha/subsystem=resource-adapters/resource-adapter=wmq.jmsra.rar/config-properties=connectionConcurrency':
+#    content:
+#      'value': 10
+#   '/profile=full-ha/subsystem=resource-adapters/resource-adapter=wmq.jmsra.rar/config-properties=logWriterEnabled':
+#    content:
+#      'value': false
+#   '/profile=full-ha/subsystem=resource-adapters/resource-adapter=wmq.jmsra.rar/config-properties=traceEnabled':
+#    content:
+#      'value': false
+# #admin-objects
+#   '/profile=full-ha/subsystem=resource-adapters/resource-adapter=wmq.jmsra.rar/admin-objects=wmqECEVEQueue':
+#    content:
+#     'class-name': 'com.ibm.mq.connector.outbound.MQQueueProxy'
+#     'enabled': true
+#     'jndi-name': 'java:/jms/ECEVEQueue'
+#     'use-java-context': true
+#   '/profile=full-ha/subsystem=resource-adapters/resource-adapter=wmq.jmsra.rar/admin-objects=wmqECEVEQueue/config-properties=baseQueueName':
+#    content:
+#     'value': 'ecrfs.venu3'
+# #connection-definations
+#   '/profile=full-ha/subsystem=resource-adapters/resource-adapter=wmq.jmsra.rar/connection-definitions=wmqCF':
+#     content:
+#      'class-name': 'com.ibm.mq.connector.outbound.ManagedQueueConnectionFactoryImpl'
+#      'enabled': true
+#      'jndi-name': 'java:/jms/wmqCF'
+#      'use-java-context': true
+#      'min-pool-size': 10
+#      'max-pool-size': 100
+#      'pool-prefill': false
+#      'pool-use-strict-min': true
+#      'flush-strategy': 'FailingConnectionOnly'
+#      'allocation-retry': 3
+#      'allocation-retry-wait-millis': 5000
+#      'no-recovery': true
+#   '/profile=full-ha/subsystem=resource-adapters/resource-adapter=wmq.jmsra.rar/connection-definitions=wmqCF/config-properties=hostName':
+#    content:
+#     'value': 'localhost'
+#   '/profile=full-ha/subsystem=resource-adapters/resource-adapter=wmq.jmsra.rar/connection-definitions=wmqCF/config-properties=transportType':
+#    content:
+#     'value': 'CIENT'
+#   '/profile=full-ha/subsystem=resource-adapters/resource-adapter=wmq.jmsra.rar/connection-definitions=wmqCF/config-properties=queueManager':
+#    content:
+#     'value': 'test'
+#   '/profile=full-ha/subsystem=resource-adapters/resource-adapter=wmq.jmsra.rar/connection-definitions=wmqCF/config-properties=port':
+#    content:
+#     'value': '10005'
+#   '/profile=full-ha/subsystem=resource-adapters/resource-adapter=wmq.jmsra.rar/connection-definitions=wmqCF/config-properties=username':
+#    content:
+#     'value': 'username'
+
+
+
+
+
+
+wildfly::socket-binding-groups:
+  '/socket-binding-group=landregistry-sockets':
+    content:
+      'default-interface': 'public'
+  '/socket-binding-group=landregistry-sockets/socket-binding=ajp':
+    content:
+      'port': 10000
+  '/socket-binding-group=landregistry-sockets/socket-binding=http':
+    content:
+      'port': 10001
+  '/socket-binding-group=landregistry-sockets/socket-binding=https':
+    content:
+      'port': 10002
+  '/socket-binding-group=landregistry-sockets/socket-binding=iiop':
+    content:
+      'port': 10003
+      'interface': 'unsecure'
+  '/socket-binding-group=landregistry-sockets/socket-binding=iiop-ssl':
+    content:
+      'port': 10004
+  '/socket-binding-group=landregistry-sockets/socket-binding=jgroups-mping':
+    content:
+      'port': 10005
+      'interface': 'private'
+      'multicast-address': '${jboss.default.multicast.address:230.0.0.4}'
+      'multicast-port': 10006
+  '/socket-binding-group=landregistry-sockets/socket-binding=jgroups-tcp':
+    content:
+      'port': 10007
+      'interface': 'private'
+  '/socket-binding-group=landregistry-sockets/socket-binding=jgroups-udp':
+    content:
+      'port': 10008
+      'interface': 'private'
+  '/socket-binding-group=landregistry-sockets/socket-binding=modcluster':
+    content:
+      'port': 10009
+      'multicast-address': '${jboss.modcluster.multicast.address:224.0.1.105}'
+      'multicast-port': '10010'
+  '/socket-binding-group=landregistry-sockets/socket-binding=txn-recovery-environment':
+    content:
+      'port': 10011
+  '/socket-binding-group=landregistry-sockets/socket-binding=txn-status-manager':
+    content:
+      'port': 10012

@@ -2,8 +2,11 @@
 
 classes:
  - profiles::packages
- 
+
 packages:
  - java-1.8.0-openjdk
 
 wildfly::version: '7.1'
+wildfly::dirname: '/opt/jboss-eap'
+wildfly::user:    'jboss-eap'
+wildfly::group:   'jboss-eap'

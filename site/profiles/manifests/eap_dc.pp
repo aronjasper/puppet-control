@@ -49,24 +49,24 @@ class profiles::eap_dc(){
     recurse => true,
     require => File[$modules]
   }
-  exec { 'download ibm driver license':
-    command  => "wget ${repository_source}/db2jcc_license_cisuz.jar -P ${wildfly::dirname}/modules/com/ibm/main",
-    path     => ['/bin', '/usr/bin', '/sbin'],
-    loglevel => 'notice',
-    user     => $wildfly::user,
-    group    => $wildfly::group,
-    creates  => "${wildfly::dirname}/modules/com/ibm/main/db2jcc_license_cisuz.jar",
-    require  => File[$modules],
-  }
-  exec { 'download ibm driver':
-    command  => "wget ${repository_source}/db2jcc4.jar -P ${wildfly::dirname}/modules/com/ibm/main",
-    path     => ['/bin', '/usr/bin', '/sbin'],
-    loglevel => 'notice',
-    user     => $wildfly::user,
-    group    => $wildfly::group,
-    creates  => "${wildfly::dirname}/modules/com/ibm/main/db2jcc4.jar",
-    require  => File[$modules],
-  }
+  # exec { 'download ibm driver license':
+  #   command  => "wget ${repository_source}/db2jcc_license_cisuz.jar -P ${wildfly::dirname}/modules/com/ibm/main",
+  #   path     => ['/bin', '/usr/bin', '/sbin'],
+  #   loglevel => 'notice',
+  #   user     => $wildfly::user,
+  #   group    => $wildfly::group,
+  #   creates  => "${wildfly::dirname}/modules/com/ibm/main/db2jcc_license_cisuz.jar",
+  #   require  => File[$modules],
+  # }
+  # exec { 'download ibm driver':
+  #   command  => "wget ${repository_source}/db2jcc4.jar -P ${wildfly::dirname}/modules/com/ibm/main",
+  #   path     => ['/bin', '/usr/bin', '/sbin'],
+  #   loglevel => 'notice',
+  #   user     => $wildfly::user,
+  #   group    => $wildfly::group,
+  #   creates  => "${wildfly::dirname}/modules/com/ibm/main/db2jcc4.jar",
+  #   require  => File[$modules],
+  # }
   file { "${wildfly::dirname}/modules/com/oracle/main/module.xml":
     ensure  => present,
     owner   => $wildfly::user,
@@ -75,49 +75,52 @@ class profiles::eap_dc(){
     recurse => true,
     require => File[$modules]
   }
-  exec { 'download oracle driver':
-    command  => "wget ${repository_source}/ojdbc7.jar -P ${wildfly::dirname}/modules/com/oracle/main",
-    path     => ['/bin', '/usr/bin', '/sbin'],
-    loglevel => 'notice',
-    user     => $wildfly::user,
-    group    => $wildfly::group,
-    creates  => "${wildfly::dirname}/modules/com/oracle/main/ojdbc7.jar",
-    require  => File[$modules],
-  }
+  # exec { 'download oracle driver':
+  #   command  => "wget ${repository_source}/ojdbc7.jar -P ${wildfly::dirname}/modules/com/oracle/main",
+  #   path     => ['/bin', '/usr/bin', '/sbin'],
+  #   loglevel => 'notice',
+  #   user     => $wildfly::user,
+  #   group    => $wildfly::group,
+  #   creates  => "${wildfly::dirname}/modules/com/oracle/main/ojdbc7.jar",
+  #   require  => File[$modules],
+  # }
 
-  $app_user = hiera_hash('wildfly::app_user',false)
-  create_resources('wildfly::config::app_user', $app_user)
+  $app_user = hiera_hash('wildfly::app_user', {})
+  # create_resources('wildfly::config::app_user', $app_user)
 
-  $dc_server_groups = hiera_hash('wildfly::dc_server_groups',false)
+  $dc_server_groups = hiera_hash('wildfly::dc_server_groups', {})
   create_resources('wildfly::domain::server_group', $dc_server_groups)
 
-  $mod_cluster_config=hiera_hash('wildfly::mod_cluster_config',false)
-  create_resources('wildfly::resource',$mod_cluster_config)
+  $mod_cluster_config=hiera_hash('wildfly::mod_cluster_config',{})
+  create_resources('wildfly::resource', $mod_cluster_config)
 
-  $undertow_config=hiera_hash('wildfly::undertow_config',false)
+  $undertow_config=hiera_hash('wildfly::undertow_config', {})
   create_resources('wildfly::resource',$undertow_config)
 
-  $default_undertow= hiera_hash('wildfly::default_undertow',false)
+  $default_undertow= hiera_hash('wildfly::default_undertow', {})
   create_resources('wildfly::resource',$default_undertow)
 
-  $driver_reg=hiera_hash('wildfly::driver_reg',false)
+  $driver_reg=hiera_hash('wildfly::driver_reg', {})
   create_resources('wildfly::datasources::driver', $driver_reg)
 
-  $datasources = hiera_hash('wildfly::datasources',false)
+  $datasources = hiera_hash('wildfly::datasources', {})
   create_resources('wildfly::datasources::xa_datasource',$datasources)
 
-  $naming = hiera_hash('wildfly::naming',false)
+  $naming = hiera_hash('wildfly::naming', {})
   #create_resources('wildfly::resource',$naming)
 
-  $system_properties = hiera_hash('wildfly::system-properties',false)
+  $system_properties = hiera_hash('wildfly::system-properties', {})
   create_resources('wildfly::resource', $system_properties)
 
-  $resource_adapters = hiera_hash('wildfly::resource_adapters',false)
+  $resource_adapters = hiera_hash('wildfly::resource_adapters', {})
   create_resources('wildfly::resource', $resource_adapters)
 
-  $servers = hiera_hash('wildfly::servers',false)
+  $servers = hiera_hash('wildfly::servers', {})
   create_resources('wildfly::resource', $servers)
 
-  $deployment = hiera_hash('wildfly::deployment',false)
+  $deployment = hiera_hash('wildfly::deployment', {})
   create_resources('wildfly::deployment', $deployment)
+
+  $socket_bindings = hiera_hash('wildfly::socket-binding-groups', {})
+  create_resources('wildfly::resource', $socket_bindings)
 }
