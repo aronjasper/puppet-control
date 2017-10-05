@@ -48,7 +48,7 @@ mod 'filebeat',                        :git => 'https://github.com/LandRegistry-
 mod 'packetbeat',                      :git => 'https://github.com/LandRegistry-Ops/puppet-packetbeat.git',
                                        :ref => '1.0.5'
 mod 'logstash',                        :git => 'https://github.com/LandRegistry-Ops/puppet-logstash.git',
-                                       :ref => '1.0.10'
+                                       :ref => '1.0.11'
 mod 'willdurand/nodejs',               '1.9.5'
 mod 'rabbit',                          :git => 'https://github.com/LandRegistry-Ops/puppet-rabbit.git',
                                        :ref => '3.0.9'
