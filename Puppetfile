@@ -72,7 +72,7 @@ mod 'ghoneycutt/hosts',                '2.5.0'
 mod 'opendj',                          :git => 'https://github.com/LandRegistry-Ops/puppet-opendj.git',
                                        :ref => 'd5ca4a4fcaddac366b5a2f2fed62269fb2f2f28c'
 mod 'openresty',                       :git => 'https://github.com/LandRegistry-Ops/puppet-openresty.git',
-                                       :ref => '3b582e49847940bb3d0e3658f5fe22ca4772e061'
+                                       :ref => '549b6622d047ce6785debd21d09617029559469e'
 mod 'static_content',                  :git => 'https://github.com/LandRegistry/puppet-openresty-static-content.git',
                                        :ref => 'ea527964d49a539731a2725f9f5d3d4e86ebf2ba'
 mod 'geoserver',                       :git => 'https://github.com/LandRegistry-Ops/puppet-geoserver.git',
