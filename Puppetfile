@@ -13,7 +13,7 @@ mod 'jfryman/selinux',                 '0.4.0'
 mod 'gradle',                          :git => 'https://github.com/LandRegistry-Ops/puppet-gradle.git',
                                        :ref => '1.1.0'
 mod 'wsgi',                            :git => 'https://github.com/LandRegistry-Ops/puppet-wsgi.git',
-                                       :ref => '1.4.3'
+                                       :ref => '1.4.4'
 mod 'leinaddm/htpasswd',               '0.0.3'
 mod 'maestrodev/wget',                 '1.7.3'
 mod 'pip',                             :git => 'https://github.com/openstack-infra/puppet-pip.git',
@@ -72,7 +72,7 @@ mod 'ghoneycutt/hosts',                '2.5.0'
 mod 'opendj',                          :git => 'https://github.com/LandRegistry-Ops/puppet-opendj.git',
                                        :ref => 'd5ca4a4fcaddac366b5a2f2fed62269fb2f2f28c'
 mod 'openresty',                       :git => 'https://github.com/LandRegistry-Ops/puppet-openresty.git',
-                                       :ref => '5c073c509ff9405e27c39f93c1154412c530ac39'
+                                       :ref => 'b286cfcf87a55205d987fdebe0bc9e1d1159c111'
 mod 'static_content',                  :git => 'https://github.com/LandRegistry/puppet-openresty-static-content.git',
                                        :ref => 'ea527964d49a539731a2725f9f5d3d4e86ebf2ba'
 mod 'geoserver',                       :git => 'https://github.com/LandRegistry-Ops/puppet-geoserver.git',
@@ -109,6 +109,7 @@ mod 'puppetlabs/pe_gem',                     '0.2.0'
 mod 'puppetlabs/ruby',                       '0.5.0'
 mod 'puppetlabs/stdlib',                     '4.15.0'
 mod 'puppetlabs/vcsrepo',                    '1.3.2'
+mod 'puppetlabs/lvm',                        '0.9.0'
 mod 'richardc/datacat',                      '0.6.2'
 mod 'stahnma/epel',                          '1.2.2'
 mod 'ajjahn/dns',                            '2.0.2'
