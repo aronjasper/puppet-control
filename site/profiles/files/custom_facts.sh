@@ -11,10 +11,10 @@ RECENTLY_PATCHED=$(echo $RECENTLY_PATCHED | sed 's/\(.*\),/\1 /')
 ## Get the current status of the applications
 APP_STATUS="{"
 if [ -d "/opt/landregistry/applications/" ]; then
-for d in /opt/landregistry/applications/*/lr-*.service ; do
-    SERVICE_NAME=$(basename $d)
-    APP_PATH=$(dirname $d)
-    APP_NAME=$(basename $APP_PATH)
+for d in /opt/landregistry/applications/* ; do
+    SERVICE_NAME=lr-$(basename $d)
+    APP_PATH=$d
+    APP_NAME=$(basename $d)
     SERVICE_PORT=''
     SERVICE_HEALTH=''
     if [ -f $APP_PATH/startup.sh ]; then
@@ -23,7 +23,10 @@ for d in /opt/landregistry/applications/*/lr-*.service ; do
         SERVICE_HEALTH=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 http://localhost:$SERVICE_PORT/health)
       fi
     fi
-    SERVICE_STATUS=$(sudo systemctl | grep ${SERVICE_NAME} | awk '{print $4;}')
+    SERVICE_STATUS=''
+    if [ -f $APP_PATH/$SERVICE_NAME.service ]; then
+      SERVICE_STATUS=$(sudo systemctl | grep ${SERVICE_NAME} | awk '{print $4;}')
+    fi
     if [ -f $APP_PATH/COMMIT ]; then
       CURRENT_COMMIT=$(cat $APP_PATH/COMMIT)
     fi
