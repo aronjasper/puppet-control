@@ -53,7 +53,7 @@ mod 'willdurand/nodejs',               '1.9.5'
 mod 'rabbit',                          :git => 'https://github.com/LandRegistry-Ops/puppet-rabbit.git',
                                        :ref => '3.0.9'
 mod 'elastic',                         :git => 'https://github.com/LandRegistry-Ops/puppet-elastic.git',
-                                       :ref => '3.0.18'
+                                       :ref => '3.0.19'
 mod 'kibana',                          :git => 'https://github.com/LandRegistry-Ops/elastic-puppet-kibana.git',
                                        :ref => '3.0.2'
 mod 'firewallservice',                 :git => 'https://github.com/LandRegistry-Ops/puppet-firewallservice.git',
