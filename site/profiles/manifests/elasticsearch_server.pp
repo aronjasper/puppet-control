@@ -8,7 +8,7 @@
 class profiles::elasticsearch_server(
   $cluster_name = undef,
 ) {
-    contain elastic
-    contain lvm
+    include elastic
+    include lvm
     Class['lvm'] -> Elasticsearch::Service[$cluster_name]
 }
