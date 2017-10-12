@@ -158,7 +158,7 @@ class profiles::nagios_client(
   # Only add swap check if this is not an aws machine
   if ($::hosting_platform != dev_aws) and ($::hosting_platform != internal_aws)
       and ($::hosting_platform != nfr_aws)
-      and ($::hosting_platform != boundary_aws) {
+      and ($::hosting_platform != aws) {
     @@nagios_service { "check_swap_${::hostname}":
       ensure                => present,
       check_command         => 'check_nrpe!check_swap\!20\!10',
