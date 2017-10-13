@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
 # Deploy tar ball of the /etc/puppet/environments folder (including secrets) for deployment to puppet masters
 
-DIR="/var/lib/jenkins/artifact_r10k"
+# Options
+DIR=$1
+
+# Variables
 PUPPETMASTER=${PUPPET_MASTER:-""}
 REMOTECI=${REMOTECI:-""}
-ARTIFACT=`ls ${DIR}/artifacts/ | sort -nr | head -1`
+ARTIFACT=`ls ${DIR}/ | sort -nr | head -1`
 
 # Purely cosmetic function to prettify output
 # Set OUTPUT_LABEL to change the label
@@ -32,7 +35,7 @@ for PUPPET in ${PUPPETMASTER} ; do
 
   # Copy artifact to puppet master
   echo "Attempting to copy ${ARTIFACT} to ${PUPPET}" | output
-  scp -o StrictHostKeyChecking=no ${DIR}/artifacts/${ARTIFACT} deployment@${PUPPET}:/tmp/ > /dev/null 2>&1
+  scp -o StrictHostKeyChecking=no ${DIR}/${ARTIFACT} deployment@${PUPPET}:/tmp/ > /dev/null 2>&1
   if [[ $? == '0' ]]; then
     echo "${ARTIFACT}" successfully copied to ${PUPPET} | output SUCCESS
   else
@@ -75,7 +78,7 @@ done
 # Copy artifact to remote ci server
 for CI in ${REMOTECI} ; do
   echo "Attempting to copy ${ARTIFACT} to ${CI}" | output
-  scp -o StrictHostKeyChecking=no ${DIR}/artifacts/${ARTIFACT} deployment@${CI}:${DIR}/artifacts/ > /dev/null 2>&1
+  scp -o StrictHostKeyChecking=no ${DIR}/${ARTIFACT} deployment@${CI}:${DIR}/ > /dev/null 2>&1
   if [[ $? == '0' ]]; then
     echo "${ARTIFACT}" successfully copied to ${CI} | output SUCCESS
   else
@@ -84,4 +87,4 @@ for CI in ${REMOTECI} ; do
 done
 
 # Tidying up step to remove old Artifacts.  Currently set to keep the 3 most recently modified files.
-ls -t /var/lib/jenkins/artifact_r10k/artifacts | sed -e '1,3d' | xargs -d '\n' rm -f
+ls -t ${DIR} | sed -e '1,3d' | xargs -d '\n' rm -f
