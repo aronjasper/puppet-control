@@ -33,8 +33,8 @@ class profiles::generic_monitoring(
   if $monitor_service {
     @@nagios_service { "${::hostname}-lr-${monitor_service}" :
       ensure                => present,
-      check_command         => "check_nrpe!check_service_procs\\!${::min_process_count_warning}:${::max_process_count_warning}\\!\
-                                ${::min_process_critical_count}:${::max_process_critical_count}\\!${::monitor_service}",
+      check_command         => "check_nrpe!check_service_procs\\!${min_process_warning_count}:${max_process_warning_count}\
+\\!${min_process_critical_count}:${max_process_critical_count}\\!${monitor_service}",
       mode                  => '0644',
       owner                 => root,
       use                   => 'generic-service',
@@ -56,11 +56,11 @@ class profiles::generic_monitoring(
       owner                 => root,
       use                   => 'generic-service',
       host_name             => $::hostname,
-      check_period          => $::check_period,
+      check_period          => $time_period,
       contact_groups        => 'admins',
       notification_interval => 0,
       notifications_enabled => 1,
-      notification_period   => $::notification_period,
+      notification_period   => $time_period,
       service_description   => "LR tcp port ${monitor_port}"
     }
   }
