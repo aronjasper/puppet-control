@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 # Deploy tar ball of the /etc/puppet/environments folder (including secrets) for deployment to puppet masters
 
-DIR="/var/lib/jenkins/artifact_r10k"
+# Options
+DIR=$1
+
+# Variables
 PUPPETMASTER=${PUPPET_MASTER:-""}
 REMOTECI=${REMOTECI:-""}
 ARTIFACT=`ls ${DIR}/artifacts/ | sort -nr | head -1`
