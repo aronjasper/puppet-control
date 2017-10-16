@@ -1,0 +1,132 @@
+---
+
+# Test values - intended to be superseeded in live use
+webproxy::upstream: http://127.0.0.1:8000
+webproxy::external_url: localhost
+
+classes:
+  - nginx
+  - files
+
+nginx::nginx_vhosts:
+  'rev_proxy':
+    server_name: ["%{hiera('webproxy::external_url')}"]
+    listen_port: 80
+    listen_options: 'default_server'
+    ssl_port: 443
+    rewrite_to_https: true
+    proxy: "%{hiera('webproxy::upstream')}"
+    proxy_redirect: 'off'
+    ssl: true
+    ssl_cert: '/etc/pki/tls/certs/rev_proxy_cert.crt'
+    ssl_key: '/etc/pki/tls/private/rev_proxy_key.key'
+    ssl_trusted_cert: '/etc/pki/tls/private/full_chain.pem'
+    ssl_dhparam: '/etc/pki/tls/certs/dhparam.pem'
+    ssl_protocols: 'TLSv1.2'
+    ssl_ciphers: 'EECDH+AESGCM:EDH+AESGCM:EECDH:EDH:!MD5:!RC4:!LOW:!MEDIUM:!CAMELLIA:!ECDSA:!DES:!DSS:!3DES:!NULL'
+    ssl_session_timeout: '1d'
+    proxy_set_header: ['X-Forwarded-Proto $scheme']
+    add_header:
+      'Strict-Transport-Security "max-age=15768000; includeSubDomains; preload"':
+      'X-Content-Type-Options nosniff':
+      'X-Frame-Options "DENY"':
+      'Cache-Control "no-cache"':
+    vhost_cfg_ssl_append:
+      # Config not direcctly supported in nginx module
+      ssl_session_tickets: 'off'
+      ssl_ecdh_curve: 'secp384r1'
+      ssl_session_cache: 'shared:SSL:10m'
+
+# Iinstall test cert,key & dhparams files- intended to be superseeded in live use
+files::files:
+  '/etc/pki/tls/certs/rev_proxy_cert.crt':
+    content: |
+      -----BEGIN CERTIFICATE-----
+      MIIDfzCCAmegAwIBAgIJAPfwIb6hAxRZMA0GCSqGSIb3DQEBCwUAMFYxCzAJBgNV
+      BAYTAkdCMRUwEwYDVQQHDAxEZWZhdWx0IENpdHkxHDAaBgNVBAoME0RlZmF1bHQg
+      Q29tcGFueSBMdGQxEjAQBgNVBAMMCWxvY2FsaG9zdDAeFw0xNzA5MjgxMzEzMzBa
+      Fw0xODA5MjgxMzEzMzBaMFYxCzAJBgNVBAYTAkdCMRUwEwYDVQQHDAxEZWZhdWx0
+      IENpdHkxHDAaBgNVBAoME0RlZmF1bHQgQ29tcGFueSBMdGQxEjAQBgNVBAMMCWxv
+      Y2FsaG9zdDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAONCH3UB3OrZ
+      XQs1Nr/sDg6VUrVwNx+kL1pSIZ3X49uLYbpLH15uO3DApUDwE/CtplcukvL1s9he
+      3sX1AwTCcDL6YpOicfrXYG7ABI3vAVLwB3P2HOTWJD5YR3KEh1/vzWXcTJlH6VL7
+      lfMij3f532Wyf19844d1Fnxd4oDZGb09R1nlBiy4o0jeM2AnLtla5k8ABm/GN7AO
+      4XJfo2ZU7qkbEAkdv3/rhFRngJZ4VDhIcq4bpGbIH7kgdYh3oDvJ0UYHSxMQ58uy
+      iUw3RcUrdoyTz38R/H3FTp9+g9J2boqqxx3jbIeEryla8WaLqamtxL7GlzmHn/vj
+      BObFsJWRxI0CAwEAAaNQME4wHQYDVR0OBBYEFNcoszMKYTHHCKPR2+ZN3kYjmtKT
+      MB8GA1UdIwQYMBaAFNcoszMKYTHHCKPR2+ZN3kYjmtKTMAwGA1UdEwQFMAMBAf8w
+      DQYJKoZIhvcNAQELBQADggEBAFQ22IgtIXDlrpJ85yHCAd6essrpNzP5yw5uJIRm
+      40oASCULeop1z5i+ZRI/+4KDeamGuC0fi6Zg33rOnBmYeZHGZncoyJCSg/KTIvn3
+      MdccVOyvIIAMPLOpIknyJ+kfzI6GIkzahIdgMXUmZ0XsLrvyvc4k8UgrN0JVdssT
+      4lsq39ct4cEIrQ0FMYTRt7jW1eYy2Bpkt4ahanRIXNrOLcJ0xfNBq25TmYv3zleD
+      NPjkZTnrZb3+1+qyNS/oe5CfCXgDmpIVyWtP7CUH7lydrIoQnse8FIN5XE6RKhxJ
+      Kto7HlZ4LrMh2s7bwgXRRIzGqhavvxW6oCSZb+TV4NOzYUM=
+      -----END CERTIFICATE-----
+  '/etc/pki/tls/private/rev_proxy_key.key':
+    content: |
+      -----BEGIN PRIVATE KEY-----
+      MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDjQh91Adzq2V0L
+      NTa/7A4OlVK1cDcfpC9aUiGd1+Pbi2G6Sx9ebjtwwKVA8BPwraZXLpLy9bPYXt7F
+      9QMEwnAy+mKTonH612BuwASN7wFS8Adz9hzk1iQ+WEdyhIdf781l3EyZR+lS+5Xz
+      Io93+d9lsn9ffOOHdRZ8XeKA2Rm9PUdZ5QYsuKNI3jNgJy7ZWuZPAAZvxjewDuFy
+      X6NmVO6pGxAJHb9/64RUZ4CWeFQ4SHKuG6RmyB+5IHWId6A7ydFGB0sTEOfLsolM
+      N0XFK3aMk89/Efx9xU6ffoPSdm6Kqscd42yHhK8pWvFmi6mprcS+xpc5h5/74wTm
+      xbCVkcSNAgMBAAECggEATMGNjGB3tB58LYfomQPqb4SBreRbyeUTVUc+MWi0ffdi
+      p6At1SAYFWoLppYvte+AqhuB6GuSNbc9ONEbFuVxLdahqsmIA7fwyxcxspqR8Og/
+      LCxo7+Vf0mrQnt4iNwXwcsHoYTEHnk55A+idWmFb0aZrHN46nwqt8I1pLimlZuOD
+      oa6y6IXoiN1X4QOQtmlIEglHuLFzO2iaCHazrEk8/IPxhB4nf1P3MCs8amTGG2Xu
+      F1a43HFHbBS3BtP4/EWFQQ/TB/2FjRkloiNzvKQHw1YA+68fbTExgNMn+1Npqb3r
+      9Fdn72fw8d/x+x6tm8fcsBjZtGusOs/ZSK2iGzfwJQKBgQDyF+EQKx05EfSGyeS8
+      P30mp3slxV3iy0bDv/KXblhHAAvmgzWJDKtu7kdj9GXyLUNuEl8y4BLs0See7JiG
+      j9UsKNRMmCYwjlYJRif7+iSiQAkMa/mIkpMC/EOLKDWueXQHGgujCZxmCrt7+HBq
+      WydSGuBqrbKwGW5bSVxw/4gN9wKBgQDwUBY0TnYUxaGUFlpMdWmCyDLksNMI6SHY
+      xy1mm1liEwK3rDE9tSrvouiCnvtN4fBbRruM9RkOWAEhJD0yz+IrQRvcuRAZtjwY
+      0oX5SQjKbfISbamziUy/wQPjOpKrBysYfLtYNgG5tfsAHx5lbrq3zUAwlFP2vL10
+      PAgOKEUwmwKBgQDqkJ59tvhykmYVr0qT5wQQztewCiJkm0auZa3ccYrRCEd/ioP1
+      jTQRoIfFXkjktFyQKvbYaWmM0T6NanqCbpxCVDEXIZhnFZJhG/uj1oNmPZtG0NuP
+      K02L5/Zdv5D7wyvbsa2yw54o9J8hh98L/dQEZowocLIglBNsGZGa3svpkwKBgBXa
+      sqo/GG37Kx6UidG6O8Yw/q/dhNOin/le47oZFp/cqrqZZkD+YNE6N3rpimEi0wD6
+      BcRj5ctwJWomKYqdbSwR177S9avg7sYzHwv0oGAIb6NNZcl2CwzFON1JTl1PYZPw
+      g/kZsD57VkBElDcVQtXETLoeQySFNZWEgBcJgoFRAoGAZigO5j8JJY1x9HTZK9tN
+      mYikuWIKHZERVVZgjKUNuoS8r+0zJdkKUXVCyksCvo/TcDl1QgoW5lLkQGUsfgff
+      jrkoLHBMaUFZ+zE79ELxiOkfdnspnW+tXu6w20vVcTrtYwvQvlH+RNnR2cqBjbAC
+      9XRPcxA3YTpJE7ypaSq707Y=
+      -----END PRIVATE KEY-----
+  '/etc/pki/tls/certs/dhparam.pem':
+    content: |
+      -----BEGIN DH PARAMETERS-----
+      MIICCAKCAgEAu69YIWTsIEhlHvBemW/5IpnCc1w74/H7KrIYklVo0ZO3qws5FUxs
+      x6EEwEZK6V9MsCIjTuVG9/nNv+IUMEJ2ORVbAWzhR66GelLcJ1Jfz+N7+Yae+03l
+      7nSmsCLL7xeoQR6BG+0hKv0B3+TNYNy2jXp/SFu0ZBix1aQAAeecpTlbq4Z+bnMK
+      gr6QpW1M1sBjNfwZetlnUb9BE8e4Oo3d4ugxaf1jXw2wfSOhSwv0OSLY8kj1nkIQ
+      HMG8X6SPqo7q+kcACH4Fu/6Er7aoHHwjLtS/EzfwsVFcW5wJQAZtjFCH8g0hX2BD
+      4pbOpX9qE+J8U1K02wfGvGdiw4t/TieDSCOaK+25si7QzNrAOvpK4NS7nMR583my
+      lL+mGayOGGWoPhY2YHa/5Hxp+DycrAxTDfJGJdskrF5Dng/KL47nPn/56GWpawmD
+      /L78cIafhu0ndMBoQ8A0SHV8W0wukWRqS7ma09gnr0gZL7ViwHTHkCCF2loQngRx
+      cR5fJy/uJp0hrNgL1QtJFTK3sdxRiUSctNoGBB580Islyj2NrZOXw6HXG0qqkAb2
+      /kLvliLSP7XdoSWD59a1AQ99i2u+maeXUA9+8bJSmuJ48g6ikoNMkBdxichiSHjS
+      nclB80fxw/puG9OQLbOisdWRl0TEtkD98yps5zzKi3B2cNnbxuJQuqsCAQI=
+      -----END DH PARAMETERS-----
+  '/etc/pki/tls/private/full_chain.pem':
+    content: |
+      -----BEGIN CERTIFICATE-----
+      MIIDfzCCAmegAwIBAgIJAPfwIb6hAxRZMA0GCSqGSIb3DQEBCwUAMFYxCzAJBgNV
+      BAYTAkdCMRUwEwYDVQQHDAxEZWZhdWx0IENpdHkxHDAaBgNVBAoME0RlZmF1bHQg
+      Q29tcGFueSBMdGQxEjAQBgNVBAMMCWxvY2FsaG9zdDAeFw0xNzA5MjgxMzEzMzBa
+      Fw0xODA5MjgxMzEzMzBaMFYxCzAJBgNVBAYTAkdCMRUwEwYDVQQHDAxEZWZhdWx0
+      IENpdHkxHDAaBgNVBAoME0RlZmF1bHQgQ29tcGFueSBMdGQxEjAQBgNVBAMMCWxv
+      Y2FsaG9zdDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAONCH3UB3OrZ
+      XQs1Nr/sDg6VUrVwNx+kL1pSIZ3X49uLYbpLH15uO3DApUDwE/CtplcukvL1s9he
+      3sX1AwTCcDL6YpOicfrXYG7ABI3vAVLwB3P2HOTWJD5YR3KEh1/vzWXcTJlH6VL7
+      lfMij3f532Wyf19844d1Fnxd4oDZGb09R1nlBiy4o0jeM2AnLtla5k8ABm/GN7AO
+      4XJfo2ZU7qkbEAkdv3/rhFRngJZ4VDhIcq4bpGbIH7kgdYh3oDvJ0UYHSxMQ58uy
+      iUw3RcUrdoyTz38R/H3FTp9+g9J2boqqxx3jbIeEryla8WaLqamtxL7GlzmHn/vj
+      BObFsJWRxI0CAwEAAaNQME4wHQYDVR0OBBYEFNcoszMKYTHHCKPR2+ZN3kYjmtKT
+      MB8GA1UdIwQYMBaAFNcoszMKYTHHCKPR2+ZN3kYjmtKTMAwGA1UdEwQFMAMBAf8w
+      DQYJKoZIhvcNAQELBQADggEBAFQ22IgtIXDlrpJ85yHCAd6essrpNzP5yw5uJIRm
+      40oASCULeop1z5i+ZRI/+4KDeamGuC0fi6Zg33rOnBmYeZHGZncoyJCSg/KTIvn3
+      MdccVOyvIIAMPLOpIknyJ+kfzI6GIkzahIdgMXUmZ0XsLrvyvc4k8UgrN0JVdssT
+      4lsq39ct4cEIrQ0FMYTRt7jW1eYy2Bpkt4ahanRIXNrOLcJ0xfNBq25TmYv3zleD
+      NPjkZTnrZb3+1+qyNS/oe5CfCXgDmpIVyWtP7CUH7lydrIoQnse8FIN5XE6RKhxJ
+      Kto7HlZ4LrMh2s7bwgXRRIzGqhavvxW6oCSZb+TV4NOzYUM=
+      -----END CERTIFICATE-----
