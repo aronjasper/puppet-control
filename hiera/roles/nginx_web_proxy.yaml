@@ -3,6 +3,7 @@
 # Test values - intended to be superseeded in live use
 webproxy::upstream: http://127.0.0.1:8000
 webproxy::external_url: localhost
+webproxy::resolver: 8.8.8.8
 
 classes:
   - nginx
@@ -11,6 +12,7 @@ classes:
 nginx::nginx_vhosts:
   'rev_proxy':
     server_name: ["%{hiera('webproxy::external_url')}"]
+    resolver: ["%{hiera('webproxy::resolver')}"]
     listen_port: 80
     listen_options: 'default_server'
     ssl_port: 443
@@ -24,7 +26,7 @@ nginx::nginx_vhosts:
     ssl_dhparam: '/etc/pki/tls/certs/dhparam.pem'
     ssl_protocols: 'TLSv1.2'
     ssl_ciphers: 'EECDH+AESGCM:EDH+AESGCM:EECDH:EDH:!MD5:!RC4:!LOW:!MEDIUM:!CAMELLIA:!ECDSA:!DES:!DSS:!3DES:!NULL'
-    ssl_session_timeout: '1d'
+    ssl_session_timeout: '10m'
     proxy_set_header: ['X-Forwarded-Proto $scheme']
     add_header:
       'Strict-Transport-Security "max-age=15768000; includeSubDomains; preload"':
