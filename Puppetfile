@@ -89,7 +89,8 @@ mod 'lrtomcat',                        :git => 'https://github.com/LandRegistry-
                                        :ref => '0.2.4'
 mod 'wildfly',                         :git => 'https://github.com/biemond/biemond-wildfly.git',
                                        :ref => 'v1.2.8'
-
+mod 'nessus',                          :git => 'https://github.com/adamcrews/puppet-nessus.git',
+                                       :ref => 'v0.3.2'
 
 # Dependency modules
 mod 'ceritsc/yum',                           '0.9.8'
