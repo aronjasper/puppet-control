@@ -1,12 +1,12 @@
 ---
 classes:
-  - profiles::packages
   - profiles::eap_slave
 
 wildfly::repository_source: 'http://192.168.99.2'
-wildfly::install_source: 'http://192.168.99.2/jboss-eap-7.1.0.Beta.tar.gz'
+wildfly::install_source:    'http://192.168.99.2/jboss-eap-7.1.0.Beta.tar.gz'
+
 wildfly::remote_username: 'slave'
 wildfly::remote_password: 'passw0rd!'
 wildfly::secret_value: 'cGFzc3cwcmQh'
 
-profiles::eap_slave::dc: 192.168.99.3
+profiles::eap_slave::dc: 192.168.99.2

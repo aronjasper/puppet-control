@@ -37,68 +37,68 @@ class profiles::eap_slave (
     "${wildfly::dirname}/modules/com/oracle/main"
   ]
 
-  file { $modules:
-    ensure  => 'directory',
-    owner   => $wildfly::user,
-    group   => $wildfly::group,
-    require => Class['::wildfly']
-  }->
-  file { "${wildfly::dirname}/modules/com/ibm/main/module.xml":
-    ensure  => present,
-    owner   => $wildfly::user,
-    group   => $wildfly::group,
-    source  => 'puppet:///modules/profiles/jboss-eap/ibm/module.xml',
-    recurse => true,
-    require => File[$modules]
-  }->
-  exec { 'download ibm driver license':
-    command  => "wget ${repository_source}/db2jcc_license_cisuz.jar -P ${wildfly::dirname}/modules/com/ibm/main",
-    path     => ['/bin', '/usr/bin', '/sbin'],
-    loglevel => 'notice',
-    user     => $wildfly::user,
-    group    => $wildfly::group,
-    creates  => "${wildfly::dirname}/modules/com/ibm/main/db2jcc_license_cisuz.jar",
-    require  => File[$modules],
-  }->
-  exec { 'download ibm driver':
-    command  => "wget ${repository_source}/db2jcc4.jar -P ${wildfly::dirname}/modules/com/ibm/main",
-    path     => ['/bin', '/usr/bin', '/sbin'],
-    loglevel => 'notice',
-    user     => $wildfly::user,
-    group    => $wildfly::group,
-    creates  => "${wildfly::dirname}/modules/com/ibm/main/db2jcc4.jar",
-    require  => File[$modules],
-  }->
-  file { "${wildfly::dirname}/modules/com/oracle/main/module.xml":
-    ensure  => present,
-    owner   => $wildfly::user,
-    group   => $wildfly::group,
-    source  => 'puppet:///modules/profiles/jboss-eap/oracle/module.xml',
-    recurse => true,
-    require => File[$modules]
-  }->
-  exec { 'download oracle driver':
-    command  => "wget ${repository_source}/ojdbc7.jar -P ${wildfly::dirname}/modules/com/oracle/main",
-    path     => ['/bin', '/usr/bin', '/sbin'],
-    loglevel => 'notice',
-    user     => $wildfly::user,
-    group    => $wildfly::group,
-    creates  => "${wildfly::dirname}/modules/com/oracle/main/ojdbc7.jar",
-    require  => File[$modules],
-  }->
-  wildfly_cli { ["/host=${::hostname}/server-config=server-one:stop","/host=${::hostname}/server-config=server-two:stop"]:
-    username => $wildfly::remote_username,
-    password => $remote_password,
-    host     => $wildfly::properties['jboss.domain.master.address'],
-    port     => '9990',
-    require  => Service['wildfly'],
-  }->
-  wildfly_resource { ["/host=${::hostname}/server-config=server-one","/host=${::hostname}/server-config=server-two"]:
-    ensure   => absent,
-    username => $wildfly::remote_username,
-    password => $remote_password,
-    host     => $wildfly::properties['jboss.domain.master.address'],
-    port     => '9990',
-    require  => Service['wildfly'],
-  }
+  # file { $modules:
+  #   ensure  => 'directory',
+  #   owner   => $wildfly::user,
+  #   group   => $wildfly::group,
+  #   require => Class['::wildfly']
+  # }->
+  # file { "${wildfly::dirname}/modules/com/ibm/main/module.xml":
+  #   ensure  => present,
+  #   owner   => $wildfly::user,
+  #   group   => $wildfly::group,
+  #   source  => 'puppet:///modules/profiles/jboss-eap/ibm/module.xml',
+  #   recurse => true,
+  #   require => File[$modules]
+  # }->
+  # exec { 'download ibm driver license':
+  #   command  => "wget ${repository_source}/db2jcc_license_cisuz.jar -P ${wildfly::dirname}/modules/com/ibm/main",
+  #   path     => ['/bin', '/usr/bin', '/sbin'],
+  #   loglevel => 'notice',
+  #   user     => $wildfly::user,
+  #   group    => $wildfly::group,
+  #   creates  => "${wildfly::dirname}/modules/com/ibm/main/db2jcc_license_cisuz.jar",
+  #   require  => File[$modules],
+  # }->
+  # exec { 'download ibm driver':
+  #   command  => "wget ${repository_source}/db2jcc4.jar -P ${wildfly::dirname}/modules/com/ibm/main",
+  #   path     => ['/bin', '/usr/bin', '/sbin'],
+  #   loglevel => 'notice',
+  #   user     => $wildfly::user,
+  #   group    => $wildfly::group,
+  #   creates  => "${wildfly::dirname}/modules/com/ibm/main/db2jcc4.jar",
+  #   require  => File[$modules],
+  # }->
+  # file { "${wildfly::dirname}/modules/com/oracle/main/module.xml":
+  #   ensure  => present,
+  #   owner   => $wildfly::user,
+  #   group   => $wildfly::group,
+  #   source  => 'puppet:///modules/profiles/jboss-eap/oracle/module.xml',
+  #   recurse => true,
+  #   require => File[$modules]
+  # }->
+  # exec { 'download oracle driver':
+  #   command  => "wget ${repository_source}/ojdbc7.jar -P ${wildfly::dirname}/modules/com/oracle/main",
+  #   path     => ['/bin', '/usr/bin', '/sbin'],
+  #   loglevel => 'notice',
+  #   user     => $wildfly::user,
+  #   group    => $wildfly::group,
+  #   creates  => "${wildfly::dirname}/modules/com/oracle/main/ojdbc7.jar",
+  #   require  => File[$modules],
+  # }->
+  # wildfly_cli { ["/host=${::hostname}/server-config=server-one:stop","/host=${::hostname}/server-config=server-two:stop"]:
+  #   username => $wildfly::remote_username,
+  #   password => $remote_password,
+  #   host     => $wildfly::properties['jboss.domain.master.address'],
+  #   port     => '9990',
+  #   require  => Service['wildfly'],
+  # }->
+  # wildfly_resource { ["/host=${::hostname}/server-config=server-one","/host=${::hostname}/server-config=server-two"]:
+  #   ensure   => absent,
+  #   username => $wildfly::remote_username,
+  #   password => $remote_password,
+  #   host     => $wildfly::properties['jboss.domain.master.address'],
+  #   port     => '9990',
+  #   require  => Service['wildfly'],
+  # }
 }
