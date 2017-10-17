@@ -75,9 +75,9 @@ listen <%= name %> *:<%= config['port'] %>
   timeout client  30s
   <%- end -%>
   <%- if config['timeout_server'] -%>
-  timeout client  <%= config['timeout_server'] %>
+  timeout server  <%= config['timeout_server'] %>
   <%- else -%>
-  timeout client  120s
+  timeout server  120s
   <%- end -%>
 
       <%-
