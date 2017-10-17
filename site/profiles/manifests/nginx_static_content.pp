@@ -99,3 +99,4 @@ class profiles::nginx_static_content (
     refreshonly => true
   }
 }
+
