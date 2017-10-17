@@ -10,10 +10,10 @@ class profiles::nessus(
   $package_name   = undef,
 ) {
   package { 'nessus_rpm':
+    ensure   => $package_ensure,
     provider => 'rpm',
     source   => $package_source,
-    ensure   => $package_ensure,
     name     => $package_name,
   }
-  include '::nessus'
+  include nessus
 }
