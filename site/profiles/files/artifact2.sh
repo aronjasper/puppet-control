@@ -4,9 +4,10 @@
 # Options
 CONTROL=$1
 SECRETS=$2
+R10K_DIR=$3
 
 # Paths
-BASE_DIR=${BASE_DIR:-'/var/lib/jenkins/artifact_r10k'}
+BASE_DIR=${BASE_DIR:-"/var/lib/jenkins/${R10K_DIR}"}
 CACHE_DIR="${BASE_DIR}/cache"
 ARTIFACTS_DIR="${BASE_DIR}/artifacts"
 ENVIRONMENTS_DIR="${BASE_DIR}/environments"

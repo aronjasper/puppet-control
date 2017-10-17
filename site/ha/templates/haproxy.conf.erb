@@ -64,6 +64,22 @@ listen <%= name %> *:<%= config['port'] %>
   option  httpchk GET <%= config['healthcheck'] %>
   option  forwardfor header X-Forwarded-For
 
+  <%- if config['timeout_connect'] -%>
+  timeout connect  <%= config['timeout_connect'] %>
+  <%- else -%>
+  timeout connect  4s
+  <%- end -%>
+  <%- if config['timeout_client'] -%>
+  timeout client  <%= config['timeout_client'] %>
+  <%- else -%>
+  timeout client  30s
+  <%- end -%>
+  <%- if config['timeout_server'] -%>
+  timeout server  <%= config['timeout_server'] %>
+  <%- else -%>
+  timeout server  120s
+  <%- end -%>
+
       <%-
         # So that we can still identify the original source of HTTP requests
         # certain headers need to be set on all HTTP requests that are proxied.
