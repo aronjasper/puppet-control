@@ -38,7 +38,7 @@
 
 class profiles::nginx_static_content (
   $listen_port    = '8085',
-  $server_name    = 'static_content',
+  $server_name    = ['static_content'],
   $root_dir       = '/srv/www/',
   $file_dirs      = ['/srv/www/files'],
   $owner          = 'root',
@@ -71,7 +71,7 @@ class profiles::nginx_static_content (
     ensure      => present,
     listen_port => $listen_port,
     www_root    => $root_dir,
-    server_name => [$server_name],
+    server_name => $server_name,
     autoindex   => 'on',
     require     => File[$file_dirs]
   }
@@ -99,3 +99,4 @@ class profiles::nginx_static_content (
     refreshonly => true
   }
 }
+
