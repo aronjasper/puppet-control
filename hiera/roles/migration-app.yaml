@@ -39,3 +39,6 @@
       configure_permission: '.*'
       read_permission: '.*'
       write_permission: '.*'
+
+  rabbitmq:
+    delete_guest_user: true

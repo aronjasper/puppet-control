@@ -4,6 +4,7 @@ Vagrantfile
 .vagrant
 modules/*
 !modules/.PLACEHOLDER
+.idea
 
 hiera/vagrant-repository.yaml
 hiera/vagrant-broker.yaml

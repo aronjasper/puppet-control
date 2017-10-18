@@ -7,7 +7,6 @@ classes:
   - profiles::postgresql
   - profiles::rabbitmq
 
-
 rabbitmq_users:
   rabbitmqadmin:
     admin: true
@@ -18,6 +17,9 @@ rabbitmq_user_permissions:
     configure_permission: '.*'
     read_permission: '.*'
     write_permission: '.*'
+
+rabbitmq:
+  delete_guest_user: true
 
 postgres_databases:
   systemofrecord:
