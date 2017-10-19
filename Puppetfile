@@ -13,7 +13,7 @@ mod 'jfryman/selinux',                 '0.4.0'
 mod 'gradle',                          :git => 'https://github.com/LandRegistry-Ops/puppet-gradle.git',
                                        :ref => '1.1.0'
 mod 'wsgi',                            :git => 'https://github.com/LandRegistry-Ops/puppet-wsgi.git',
-                                       :ref => '1.4.5'
+                                       :ref => '1.4.6'
 mod 'leinaddm/htpasswd',               '0.0.3'
 mod 'maestrodev/wget',                 '1.7.3'
 mod 'pip',                             :git => 'https://github.com/openstack-infra/puppet-pip.git',
@@ -89,7 +89,8 @@ mod 'lrtomcat',                        :git => 'https://github.com/LandRegistry-
                                        :ref => '0.2.4'
 mod 'wildfly',                         :git => 'https://github.com/biemond/biemond-wildfly.git',
                                        :ref => 'v1.2.8'
-
+mod 'nessus',                          :git => 'https://github.com/adamcrews/puppet-nessus.git',
+                                       :ref => 'v0.3.2'
 
 # Dependency modules
 mod 'ceritsc/yum',                           '0.9.8'
