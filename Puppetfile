@@ -67,7 +67,7 @@ mod 'postgres',                        :git => 'https://github.com/LandRegistry-
 mod 'powerdns',                        :git => 'https://github.com/LandRegistry-Ops/puppet-powerdns.git',
                                        :ref => '0.3.0'
 mod 'security',                        :git => 'https://github.com/LandRegistry-Ops/puppet-security.git',
-                                       :ref => '0.3.10'
+                                       :ref => '0.3.11'
 mod 'ghoneycutt/hosts',                '2.5.0'
 mod 'opendj',                          :git => 'https://github.com/LandRegistry-Ops/puppet-opendj.git',
                                        :ref => 'd5ca4a4fcaddac366b5a2f2fed62269fb2f2f28c'
