@@ -91,7 +91,9 @@ class profiles::eap_dc(){
   $socket_group_resource = "/socket-binding-group=${socket_group_name}"
 
   wildfly::resource { $socket_group_resource :
-    content => { 'default-interface' => 'public' },
+    content => {
+      'default-interface' => 'public'
+    },
     require => Class[wildfly]
   }
 
@@ -116,17 +118,23 @@ class profiles::eap_dc(){
   $custom_sockets = hiera_hash('wildfly::customisations::socket-bindings', $default_custom_sockets)
 
   wildfly::resource { "${socket_group_resource}/socket-binding=ajp" :
-    content => { 'port' => $custom_sockets['ajp'] },
+    content => {
+      'port' => $custom_sockets['ajp']
+    },
     require => Wildfly::Resource[$socket_group_resource]
   }
 
   wildfly::resource { "${socket_group_resource}/socket-binding=http" :
-    content => { 'port' => $custom_sockets['http'] },
+    content => {
+      'port' => $custom_sockets['http']
+    },
     require => Wildfly::Resource[$socket_group_resource]
   }
 
   wildfly::resource { "${socket_group_resource}/socket-binding=https" :
-    content => { 'port' => $custom_sockets['https'] },
+    content => {
+      'port' => $custom_sockets['https']
+    },
     require => Wildfly::Resource[$socket_group_resource]
   }
 
@@ -139,7 +147,9 @@ class profiles::eap_dc(){
   }
 
   wildfly::resource { "${socket_group_resource}/socket-binding=iiop-ssl" :
-    content => { 'port' => $custom_sockets['iiop-ssl'] },
+    content => {
+      'port' => $custom_sockets['iiop-ssl']
+    },
     require => Wildfly::Resource[$socket_group_resource]
   }
 
@@ -147,7 +157,9 @@ class profiles::eap_dc(){
     content => {
       'port'              => 0,
       'interface'         => 'private',
-      'multicast-address' => { 'EXPRESSION_VALUE' => '${jboss.default.multicast.address:230.0.0.4}' },
+      'multicast-address' => {
+        'EXPRESSION_VALUE' => '${jboss.default.multicast.address:230.0.0.4}'
+      },
       'multicast-port'    => $custom_sockets['jgroups-mping-multicast']
     },
     require => Wildfly::Resource[$socket_group_resource]
@@ -173,19 +185,25 @@ class profiles::eap_dc(){
   wildfly::resource { "${socket_group_resource}/socket-binding=modcluster" :
     content => {
       'port'              => 0,
-      'multicast-address' => { 'EXPRESSION_VALUE' => '${jboss.modcluster.multicast.address:224.0.1.105}' },
+      'multicast-address' => {
+        'EXPRESSION_VALUE' => '${jboss.modcluster.multicast.address:224.0.1.105}'
+      },
       'multicast-port'    => $custom_sockets['modcluster-multicast']
     },
     require => Wildfly::Resource[$socket_group_resource]
   }
 
   wildfly::resource { "${socket_group_resource}/socket-binding=txn-recovery-environment" :
-    content => { 'port' => $custom_sockets['txn-recovery-environment'] },
+    content => {
+      'port' => $custom_sockets['txn-recovery-environment']
+    },
     require => Wildfly::Resource[$socket_group_resource]
   }
 
   wildfly::resource { "${socket_group_resource}/socket-binding=txn-status-manager" :
-    content => { 'port' => $custom_sockets['txn-status-manager'] },
+    content => {
+      'port' => $custom_sockets['txn-status-manager']
+    },
     require => Wildfly::Resource[$socket_group_resource]
   }
 
@@ -275,22 +293,30 @@ class profiles::eap_dc(){
   }
 
   wildfly::resource { "${mq_resource_adapter}/config-properties=connectionConcurrency" :
-    content => { 'value' => 10 },
+    content => {
+      'value' => 10
+    },
     require => Wildfly::Resource[$mq_resource_adapter]
   }
 
   wildfly::resource { "${mq_resource_adapter}/config-properties=logWriterEnabled" :
-    content => { 'value' => true },
+    content => {
+      'value' => true
+    },
     require => Wildfly::Resource[$mq_resource_adapter]
   }
 
   wildfly::resource { "${mq_resource_adapter}/config-properties=traceEnabled" :
-    content => { 'value' => false },
+    content => {
+      'value' => false
+    },
     require => Wildfly::Resource[$mq_resource_adapter]
   }
 
   wildfly::resource { "/profile=${mq_profile}/subsystem=ejb3" :
-    content => { 'default-resource-adapter-name' => 'wmq.jmsra.rar' },
+    content => {
+      'default-resource-adapter-name' => 'wmq.jmsra.rar'
+    },
     require => Wildfly::Resource[$mq_resource_adapter]
   }
 
@@ -514,32 +540,44 @@ class profiles::eap_dc(){
     # Something to check at a later date.
 
     wildfly::resource { '/system-property=MQ.transportType' :
-      content => { 'value' => 'CLIENT' },
+      content => {
+        'value' => 'CLIENT'
+      },
       require => Wildfly::Resource[$mq_connection_definition]
     }
 
     wildfly::resource { '/system-property=MQ.username' :
-      content => { 'value' => $mq_config['username'] },
+      content => {
+        'value' => $mq_config['username']
+      },
       require => Wildfly::Resource[$mq_connection_definition]
     }
 
     wildfly::resource { '/system-property=MQ.hostName' :
-      content => { 'value' => $mq_config['hostname'] },
+      content => {
+        'value' => $mq_config['hostname']
+      },
       require => Wildfly::Resource[$mq_connection_definition]
     }
 
     wildfly::resource { '/system-property=MQ.port' :
-      content => { 'value' => $mq_config['port'] },
+      content => {
+        'value' => $mq_config['port']
+      },
       require => Wildfly::Resource[$mq_connection_definition]
     }
 
     wildfly::resource { '/system-property=MQ.queuemanager' :
-      content => { 'value' => $mq_config['queueManager'] },
+      content => {
+        'value' => $mq_config['queueManager']
+      },
       require => Wildfly::Resource[$mq_connection_definition]
     }
 
     wildfly::resource { '/system-property=MQ.channel' :
-      content => { 'value' => $mq_config['channel'] },
+      content => {
+        'value' => $mq_config['channel']
+      },
       require => Wildfly::Resource[$mq_connection_definition]
     }
 
@@ -559,7 +597,9 @@ class profiles::eap_dc(){
     }
 
     wildfly::resource { "${mq_resource_adapter}/admin-objects=wmqECEVEQueue/config-properties=baseQueueName" :
-      content => { 'value' => 'base.queue'},
+      content => {
+        'value' => 'base.queue'
+      },
       require => Wildfly::Resource["${mq_resource_adapter}/admin-objects=wmqECEVEQueue"]
     }
 
@@ -594,12 +634,16 @@ class profiles::eap_dc(){
   }
 
   wildfly::resource { ["${ejb_remoting_resource}/remote-outbound-connection=remote-ejb-connection-1/property=SASL_DISALLOWED_MECHANISMS", "${ejb_remoting_resource}/remote-outbound-connection=remote-ejb-connection-2/property=SASL_DISALLOWED_MECHANISMS"] :
-    content => { 'value' => 'JBOSS-LOCAL-USER' },
+    content => {
+      'value' => 'JBOSS-LOCAL-USER'
+    },
     require => Wildfly::Resource["${ejb_remoting_resource}/remote-outbound-connection=remote-ejb-connection-1", "${ejb_remoting_resource}/remote-outbound-connection=remote-ejb-connection-2"]
   }
 
   wildfly::resource { ["${ejb_remoting_resource}/remote-outbound-connection=remote-ejb-connection-1/property=SASL_POLICY_NOANONYMOUS", "${ejb_remoting_resource}/remote-outbound-connection=remote-ejb-connection-2/property=SASL_POLICY_NOANONYMOUS"] :
-    content => { 'value' => false },
+    content => {
+      'value' => false
+    },
     require => Wildfly::Resource["${ejb_remoting_resource}/remote-outbound-connection=remote-ejb-connection-1", "${ejb_remoting_resource}/remote-outbound-connection=remote-ejb-connection-2"]
   }
 
