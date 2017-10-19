@@ -5,8 +5,15 @@ classes:
 wildfly::repository_source: 'http://192.168.99.2'
 wildfly::install_source:    'http://192.168.99.2/jboss-eap-7.1.0.Beta.tar.gz'
 
-wildfly::remote_username: 'slave'
-wildfly::remote_password: 'passw0rd!'
-wildfly::secret_value: 'cGFzc3cwcmQh'
+wildfly::domain_controller: 192.168.99.2
+wildfly::remote_username:  'slave'
+wildfly::secret_value:     'cGFzc3cwcmQh'
+wildfly::ejbsecret_value:  'cGFzc3cwcmQh'
 
-profiles::eap_slave::dc: 192.168.99.2
+wildfly::mgmt_users:
+  slave:
+    password: 'passw0rd!'
+
+wildfly::app_users:
+  ejbclient:
+    password: 'passw0rd!'

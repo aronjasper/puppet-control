@@ -30,6 +30,10 @@ wildfly::customisations::mqconfig:
   port:         10000
   queuemanager: TEST
 
+wildfly::customisations::remote_ejb_hosts:
+  - 192.168.99.4
+  - 192.168.99.4
+
 # For documentation purposes only.
 # wildfly::customisations::socket-bindings:
 #   ajp:                      10000

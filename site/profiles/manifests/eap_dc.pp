@@ -2,6 +2,8 @@
 
 class profiles::eap_dc(){
 
+  include ::stdlib
+
   # Assume that if we have multiple interfaces that eth1 is the data
   if ($::ipaddress_eth1) {
     $mgmt_addr = $::ipaddress_eth0
@@ -25,11 +27,15 @@ class profiles::eap_dc(){
     console_log  => '/var/log/jboss-eap/console.log',
     mode         => 'domain',
     host_config  => 'host-master.xml',
+    jboss_opts   => '-Djava.net.preferIPv4Stack=true',
     properties   => {
       'jboss.bind.address'            => $data_addr,
-      'jboss.bind.address.management' => $data_addr
+      'jboss.bind.address.management' => $data_addr,
+      'jboss.bind.address.private'    => $data_addr
     }
   }
+
+
 
   $app_users = hiera_hash('wildfly::app_users', {})
   create_resources('wildfly::config::app_user', $app_users)
@@ -55,6 +61,24 @@ class profiles::eap_dc(){
   #$deployment = hiera_hash('wildfly::deployment', {})
   #create_resources('wildfly::deployment', $deployment)
 
+
+  ##############################################################################
+  ############################## KERNEL SETTINGS ###############################
+  ##############################################################################
+
+  /*
+    These parameters are required on all systems in order to ensure that JGroups
+    has appropriate sized buffers to work with. This should eventually be split
+    into it's own class.
+  */
+
+  include ::sysctl::base # https://github.com/thias/puppet-sysctl
+
+  # Multicast receive buffer @ 20MiB
+  sysctl { 'net.core.rmem_max' : value => 20971520 }
+
+  # Multicast write buffer @ 1MiB
+  sysctl { 'net.core.wmem_max' : value => 1048576 }
 
   ##############################################################################
   ############################## SOCKET BINDINGS ###############################
@@ -86,6 +110,7 @@ class profiles::eap_dc(){
     'jgroups-mping-multicast'  => 10006,
     'jgroups-tcp'              => 10007,
     'jgroups-udp'              => 10008,
+    'jgroups-udp-multicast'    => 10009,
     'modcluster'               => 10009,
     'modcluster-multicast'     => 10010,
     'txn-recovery-environment' => 10011,
@@ -124,7 +149,8 @@ class profiles::eap_dc(){
 
   wildfly::resource { "${socket_group_resource}/socket-binding=jgroups-mping" :
     content => {
-      'port'              => $custom_sockets['jgroups-mping'],
+      # 'port'              => $custom_sockets['jgroups-mping'],
+      'port'              => 0,
       'interface'         => 'private',
       'multicast-address' => { 'EXPRESSION_VALUE' => '${jboss.default.multicast.address:230.0.0.4}' },
       'multicast-port'    => $custom_sockets['jgroups-mping-multicast']
@@ -142,15 +168,16 @@ class profiles::eap_dc(){
 
   wildfly::resource { "${socket_group_resource}/socket-binding=jgroups-udp" :
     content => {
-      'port'      => $custom_sockets['jgroups-udp'],
-      'interface' => 'private'
+      'port'           => $custom_sockets['jgroups-udp'],
+      'interface'      => 'private',
+      'multicast-port' => $custom_sockets['jgroups-udp-multicast']
     },
     require => Wildfly::Resource[$socket_group_resource]
   }
 
   wildfly::resource { "${socket_group_resource}/socket-binding=modcluster" :
     content => {
-      'port'              => $custom_sockets['modcluster'],
+      'port'              => 0,
       'multicast-address' => { 'EXPRESSION_VALUE' => '${jboss.modcluster.multicast.address:224.0.1.105}' },
       'multicast-port'    => $custom_sockets['modcluster-multicast']
     },
@@ -167,6 +194,52 @@ class profiles::eap_dc(){
     require => Wildfly::Resource[$socket_group_resource]
   }
 
+  wildfly::resource { "${socket_group_resource}/remote-destination-outbound-socket-binding=mail-smtp" :
+    content => {
+      'host' => 'localhost',
+      'port' => '25'
+    },
+    require => Wildfly::Resource[$socket_group_resource]
+  }
+
+  # Although we use the same socket group for all servers, the outbound
+  # definitions are only actually required by frontend profiles.
+
+  $remote_ejb_hosts = hiera('wildfly::customisations::remote_ejb_hosts', ['remote-ejb-1.host', 'remote-ejb-2.host'])
+
+  wildfly::resource { "${socket_group_resource}/remote-destination-outbound-socket-binding=remote-ejb-1" :
+    content => {
+      'host' => $remote_ejb_hosts[0],
+      'port' => $custom_sockets['http']
+    },
+    require => Wildfly::Resource[$socket_group_resource]
+  }
+
+  wildfly::resource { "${socket_group_resource}/remote-destination-outbound-socket-binding=remote-ejb-2" :
+    content => {
+      'host' => $remote_ejb_hosts[1],
+      'port' => $custom_sockets['http']
+    },
+    require => Wildfly::Resource[$socket_group_resource]
+  }
+
+
+  ##############################################################################
+  ############################## PROFILE CREATION ##############################
+  ##############################################################################
+
+  wildfly::cli { "create-${profiles['frontend']}" :
+    command => "/profile=full-ha:clone(to-profile=${profiles['frontend']})",
+    unless  => "(result == ${profiles['frontend']}) of /profile=${profiles['frontend']}:read-attribute(name=name)",
+    require => Service[wildfly]
+  }
+
+  wildfly::cli { "create-${profiles['backend']}" :
+    command => "/profile=full-ha:clone(to-profile=${profiles['backend']})",
+    unless  => "(result == ${profiles['backend']}) of /profile=${profiles['backend']}:read-attribute(name=name)",
+    require => Service[wildfly]
+  }
+
 
   ##############################################################################
   ############################### SERVER GROUPS ################################
@@ -177,7 +250,7 @@ class profiles::eap_dc(){
       'profile'              => $profiles['frontend'],
       'socket-binding-group' => $socket_group_name
     },
-    require => [Class['Wildfly'], Wildfly::Resource[$socket_group_resource]]
+    require => [Class['Wildfly'], Wildfly::Resource[$socket_group_resource], Wildfly::Cli["create-${profiles['frontend']}"]]
   }
 
   wildfly::domain::server_group { 'backend-main' :
@@ -185,7 +258,7 @@ class profiles::eap_dc(){
       'profile'              => $profiles['backend'],
       'socket-binding-group' => $socket_group_name
     },
-    require => [Class['Wildfly'], Wildfly::Resource[$socket_group_resource]]
+    require => [Class['Wildfly'], Wildfly::Resource[$socket_group_resource], Wildfly::Cli["create-${profiles['backend']}"]]
   }
 
 
@@ -203,7 +276,7 @@ class profiles::eap_dc(){
       'transaction-support' => 'XATransaction',
       'statistics-enabled'  => true
     },
-    require => Class['wildfly']
+    require => [Class['wildfly'], Wildfly::Cli["create-${mq_profile}"]]
   }
 
   wildfly::resource { "${mq_resource_adapter}/config-properties=connectionConcurrency" :
@@ -320,16 +393,18 @@ class profiles::eap_dc(){
 
   wildfly::datasources::driver { 'ibmdb2' :
     driver_name                     => 'ibm',
-    driver_module_name               => 'com.ibm',
+    driver_module_name              => 'com.ibm',
     driver_xa_datasource_class_name => 'com.ibm.db2.jcc.DB2XADataSource',
-    target_profile                  => $db_profile
+    target_profile                  => $db_profile,
+    require                         => Wildfly::Cli["create-${db_profile}"]
   }
 
   wildfly::datasources::driver { 'oracle' :
     driver_name                     => 'oracle',
     driver_module_name              => 'com.oracle',
     driver_xa_datasource_class_name => 'oracle.jdbc.xa.client.OracleXADataSource',
-    target_profile                  => $db_profile
+    target_profile                  => $db_profile,
+    require                         => Wildfly::Cli["create-${db_profile}"]
   }
 
 
@@ -501,6 +576,44 @@ class profiles::eap_dc(){
       require => Wildfly::Resource["${mq_resource_adapter}/admin-objects=wmqECEVEQueue"]
     }
 
+  }
+
+
+  ##############################################################################
+  ############################# EJB CONFIGURATION ##############################
+  ##############################################################################
+
+  $ejb_profile = $profiles['frontend']
+  $ejb_remoting_resource = "/profile=${ejb_profile}/subsystem=remoting"
+
+  wildfly::resource { "${ejb_remoting_resource}/remote-outbound-connection=remote-ejb-connection-1" :
+    content => {
+      'outbound-socket-binding-ref' => 'remote-ejb-1',
+      'protocol'                    => 'http-remoting',
+      'security-realm'              => 'ApplicationRealm',
+      'username'                    => 'ejbuser'
+    },
+    require => [Wildfly::Resource["${socket_group_resource}/remote-destination-outbound-socket-binding=remote-ejb-1"], Wildfly::Cli["create-${ejb_profile}"]]
+  }
+
+  wildfly::resource { "${ejb_remoting_resource}/remote-outbound-connection=remote-ejb-connection-2" :
+    content => {
+      'outbound-socket-binding-ref' => 'remote-ejb-2',
+      'protocol'                    => 'http-remoting',
+      'security-realm'              => 'ApplicationRealm',
+      'username'                    => 'ejbuser'
+    },
+    require => [Wildfly::Resource["${socket_group_resource}/remote-destination-outbound-socket-binding=remote-ejb-2"], Wildfly::Cli["create-${ejb_profile}"]]
+  }
+
+  wildfly::resource { ["${ejb_remoting_resource}/remote-outbound-connection=remote-ejb-connection-1/property=SASL_DISALLOWED_MECHANISMS", "${ejb_remoting_resource}/remote-outbound-connection=remote-ejb-connection-2/property=SASL_DISALLOWED_MECHANISMS"] :
+    content => { 'value' => 'JBOSS-LOCAL-USER' },
+    require => Wildfly::Resource["${ejb_remoting_resource}/remote-outbound-connection=remote-ejb-connection-1", "${ejb_remoting_resource}/remote-outbound-connection=remote-ejb-connection-2"]
+  }
+
+  wildfly::resource { ["${ejb_remoting_resource}/remote-outbound-connection=remote-ejb-connection-1/property=SASL_POLICY_NOANONYMOUS", "${ejb_remoting_resource}/remote-outbound-connection=remote-ejb-connection-2/property=SASL_POLICY_NOANONYMOUS"] :
+    content => { 'value' => false },
+    require => Wildfly::Resource["${ejb_remoting_resource}/remote-outbound-connection=remote-ejb-connection-1", "${ejb_remoting_resource}/remote-outbound-connection=remote-ejb-connection-2"]
   }
 
 }
