@@ -66,11 +66,9 @@ class profiles::eap_dc(){
   ############################## KERNEL SETTINGS ###############################
   ##############################################################################
 
-  /*
-    These parameters are required on all systems in order to ensure that JGroups
-    has appropriate sized buffers to work with. This should eventually be split
-    into it's own class.
-  */
+  # These parameters are required on all systems in order to ensure that JGroups
+  # has appropriate sized buffers to work with. This should eventually be split
+  # into it's own class.
 
   include ::sysctl::base # https://github.com/thias/puppet-sysctl
 
@@ -84,11 +82,9 @@ class profiles::eap_dc(){
   ############################## SOCKET BINDINGS ###############################
   ##############################################################################
 
-  /*
-    Note: Later I want to move this stuff out in to a seperate high-level module.
-    Not all of these ports are likely used. Once custom profiles are used, it's
-    worth reviewing which ports we are using so we can remove the unused ones.
-  */
+  # Note: Later I want to move this stuff out in to a seperate high-level module.
+  # Not all of these ports are likely used. Once custom profiles are used, it's
+  # worth reviewing which ports we are using so we can remove the unused ones.
 
   # Set up custom socket group
   $socket_group_name     = 'landregistry-sockets'
@@ -149,7 +145,6 @@ class profiles::eap_dc(){
 
   wildfly::resource { "${socket_group_resource}/socket-binding=jgroups-mping" :
     content => {
-      # 'port'              => $custom_sockets['jgroups-mping'],
       'port'              => 0,
       'interface'         => 'private',
       'multicast-address' => { 'EXPRESSION_VALUE' => '${jboss.default.multicast.address:230.0.0.4}' },
@@ -254,7 +249,7 @@ class profiles::eap_dc(){
   }
 
   wildfly::domain::server_group { 'backend-main' :
-    config => {
+    config  => {
       'profile'              => $profiles['backend'],
       'socket-binding-group' => $socket_group_name
     },
@@ -313,11 +308,9 @@ class profiles::eap_dc(){
   ############################ DRIVER INSTALLATION #############################
   ##############################################################################
 
-  /*
-    Note: Since this also needs to be carried out on the slaves, it makes sense for
-    this to be the first thing split out into a seperate manifest when this is
-    converted to it's own module.
-  */
+  # Note: Since this also needs to be carried out on the slaves, it makes sense for
+  # this to be the first thing split out into a seperate manifest when this is
+  # converted to it's own module.
 
   $repository_source = hiera('wildfly::repository_source', false)
 
@@ -412,14 +405,12 @@ class profiles::eap_dc(){
   ######################### DATASOURCES CONFIGURATION ##########################
   ##############################################################################
 
-  /*
-    Datasource objects are relatively static so we have chosen to mostly harcode
-    their entries into this manifest directly, only exposing
-    environment-specific parameters.
-
-    Later it might become necessary to have certain other parameters such as
-    pool sizes configurable on a per-environment basis.
-  */
+  # Datasource objects are relatively static so we have chosen to mostly harcode
+  # their entries into this manifest directly, only exposing
+  # environment-specific parameters.
+  #
+  # Later it might become necessary to have certain other parameters such as
+  # pool sizes configurable on a per-environment basis.
 
   $db2_config = hiera_hash('wildfly::customisations::db2config', false)
 
@@ -433,7 +424,7 @@ class profiles::eap_dc(){
         'validate-on-match'                   => false,
         'track-statements'                    => true,
         'pool-prefill'                        => false,
-        'jndi-name'                           => "java:/DB2XADS",
+        'jndi-name'                           => 'java:/DB2XADS',
         'driver-name'                         => 'ibmdb2',
         'user-name'                           => $db2_config['username'],
         'password'                            => $db2_config['password'],
@@ -461,7 +452,7 @@ class profiles::eap_dc(){
           'currentFunctionPath' => { value => 'SYST' }
         }
       },
-      require => Wildfly::Datasources::Driver['ibmdb2']
+      require        => Wildfly::Datasources::Driver['ibmdb2']
     }
 
   }
@@ -518,11 +509,9 @@ class profiles::eap_dc(){
       require => Wildfly::Resource[$mq_connection_definition]
     }
 
-    /*
-      According to IBM's documentation the above parameters are required to exist
-      in the server properties. These are duplicated and may not be neccessary.
-      Something to check at a later date.
-    */
+    # According to IBM's documentation the above parameters are required to exist
+    # in the server properties. These are duplicated and may not be neccessary.
+    # Something to check at a later date.
 
     wildfly::resource { '/system-property=MQ.transportType' :
       content => { 'value' => 'CLIENT' },
@@ -554,12 +543,10 @@ class profiles::eap_dc(){
       require => Wildfly::Resource[$mq_connection_definition]
     }
 
-    /*
-      There are different queue objects for each queue required and each of these
-      requires individual configuration.
-
-      This could be further simplified in a custom resource group in future.
-    */
+    # There are different queue objects for each queue required and each of these
+    # requires individual configuration.
+    #
+    # This could be further simplified in a custom resource group in future.
 
     wildfly::resource { "${mq_resource_adapter}/admin-objects=wmqECEVEQueue" :
       content => {
