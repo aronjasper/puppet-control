@@ -8,9 +8,6 @@ webproxy::resolver: 8.8.8.8
 classes:
   - nginx
   - files
-nginx:
-  serer_tokens: 'off'
-
 
 nginx::nginx_vhosts:
   'rev_proxy':
