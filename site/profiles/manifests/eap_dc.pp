@@ -153,12 +153,13 @@ class profiles::eap_dc(){
     require => Wildfly::Resource[$socket_group_resource]
   }
 
+  $jgroups_address = '{jboss.default.multicast.address:230.0.0.4}'
   wildfly::resource { "${socket_group_resource}/socket-binding=jgroups-mping" :
     content => {
       'port'              => 0,
       'interface'         => 'private',
       'multicast-address' => {
-        'EXPRESSION_VALUE' => '${jboss.default.multicast.address:230.0.0.4}'
+        'EXPRESSION_VALUE' => "$${jgroups_address}"
       },
       'multicast-port'    => $custom_sockets['jgroups-mping-multicast']
     },
@@ -182,11 +183,12 @@ class profiles::eap_dc(){
     require => Wildfly::Resource[$socket_group_resource]
   }
 
+  $modcluster_address = '{jboss.modcluster.multicast.address:224.0.1.105}'
   wildfly::resource { "${socket_group_resource}/socket-binding=modcluster" :
     content => {
       'port'              => 0,
       'multicast-address' => {
-        'EXPRESSION_VALUE' => '${jboss.modcluster.multicast.address:224.0.1.105}'
+        'EXPRESSION_VALUE' => "$${modcluster_address}"
       },
       'multicast-port'    => $custom_sockets['modcluster-multicast']
     },
