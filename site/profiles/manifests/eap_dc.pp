@@ -258,7 +258,7 @@ class profiles::eap_dc(){
   ############################### SERVER GROUPS ################################
   ##############################################################################
 
-  wildfly::resource { '/server-group=frontend-main' :
+  wildfly::resource { '/server-group=frontend-web' :
     content => {
       'profile'              => $profiles['frontend'],
       'socket-binding-group' => $socket_group_name
@@ -266,7 +266,64 @@ class profiles::eap_dc(){
     require => [Class['Wildfly'], Wildfly::Resource[$socket_group_resource], Wildfly::Cli["create-${profiles['frontend']}"]]
   }
 
+  wildfly::resource { '/server-group=frontend-b2b' :
+    content => {
+      'profile'              => $profiles['frontend'],
+      'socket-binding-group' => $socket_group_name
+    },
+    require => [Class['Wildfly'], Wildfly::Resource[$socket_group_resource], Wildfly::Cli["create-${profiles['frontend']}"]]
+  }
+
+  wildfly::resource { '/server-group=frontend-b2b-stubs' :
+    content => {
+      'profile'              => $profiles['frontend'],
+      'socket-binding-group' => $socket_group_name
+    },
+    require => [Class['Wildfly'], Wildfly::Resource[$socket_group_resource], Wildfly::Cli["create-${profiles['frontend']}"]]
+  }
+
+  wildfly::resource { '/server-group=frontend-extra' :
+    content => {
+      'profile'              => $profiles['frontend'],
+      'socket-binding-group' => $socket_group_name
+    },
+    require => [Class['Wildfly'], Wildfly::Resource[$socket_group_resource], Wildfly::Cli["create-${profiles['frontend']}"]]
+  }
+
+
   wildfly::domain::server_group { 'backend-main' :
+    config  => {
+      'profile'              => $profiles['backend'],
+      'socket-binding-group' => $socket_group_name
+    },
+    require => [Class['Wildfly'], Wildfly::Resource[$socket_group_resource], Wildfly::Cli["create-${profiles['backend']}"]]
+  }
+
+  wildfly::domain::server_group { 'backend-crm' :
+    config  => {
+      'profile'              => $profiles['backend'],
+      'socket-binding-group' => $socket_group_name
+    },
+    require => [Class['Wildfly'], Wildfly::Resource[$socket_group_resource], Wildfly::Cli["create-${profiles['backend']}"]]
+  }
+
+  wildfly::domain::server_group { 'backend-xenq' :
+    config  => {
+      'profile'              => $profiles['backend'],
+      'socket-binding-group' => $socket_group_name
+    },
+    require => [Class['Wildfly'], Wildfly::Resource[$socket_group_resource], Wildfly::Cli["create-${profiles['backend']}"]]
+  }
+
+  wildfly::domain::server_group { 'backend-hr' :
+    config  => {
+      'profile'              => $profiles['backend'],
+      'socket-binding-group' => $socket_group_name
+    },
+    require => [Class['Wildfly'], Wildfly::Resource[$socket_group_resource], Wildfly::Cli["create-${profiles['backend']}"]]
+  }
+
+  wildfly::domain::server_group { 'backend-geoserver' :
     config  => {
       'profile'              => $profiles['backend'],
       'socket-binding-group' => $socket_group_name
