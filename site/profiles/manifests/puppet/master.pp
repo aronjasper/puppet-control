@@ -23,7 +23,8 @@ class profiles::puppet::master (
   $hiera_path   = '/etc/puppet/hiera.yaml',
   $arguments    = '--no-daemonize --onetime --logdest syslog > /dev/null 2>&1',
   $run_hours    = '08-16',
-  $run_days     = '1-5'
+  $run_days     = '1-5',
+  $monitoring   = true
 
   ){
 
@@ -118,27 +119,27 @@ class profiles::puppet::master (
     exec { 'stop-puppetmaster' :
       command => '/usr/sbin/service puppetmaster stop',
       onlyif  => '/usr/sbin/service puppetmaster status'
-    }->
+    }
     # Remove old puppetmaster service from systemd
-    file { '/usr/lib/systemd/system/puppetmaster.service' :
+    -> file { '/usr/lib/systemd/system/puppetmaster.service' :
       ensure  => absent,
-    }->
+    }
     # Configure systemd to start puppet unicorn service
-    file { '/etc/systemd/system/puppetmaster-unicorn.service' :
+    -> file { '/etc/systemd/system/puppetmaster-unicorn.service' :
       ensure  => present,
       owner   => 'root',
       group   => 'root',
       source  => 'puppet:///modules/profiles/puppetmaster-unicorn.service',
       notify  => Exec ['systemctl daemon-reload'],
       require => Package ['unicorn','rack']
-    }->
+    }
     # Reload systemd to pick up config changexs
-    exec {'systemctl daemon-reload' :
+    -> exec {'systemctl daemon-reload' :
       command     => '/usr/bin/systemctl daemon-reload',
       refreshonly => true
-    }->
+    }
     # Start puppet master service
-    service { 'puppetmaster-unicorn' :
+    -> service { 'puppetmaster-unicorn' :
       ensure  => running,
       enable  => true,
       require => File ['/etc/systemd/system/puppetmaster-unicorn.service']
@@ -231,5 +232,9 @@ class profiles::puppet::master (
       minute  => [0,30],
       hour    => $run_hours,
       weekday => $run_days,
+    }
+
+    if $monitoring {
+      include profiles::puppet::master_monitoring
     }
 }
