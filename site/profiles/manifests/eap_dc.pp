@@ -153,13 +153,12 @@ class profiles::eap_dc(){
     require => Wildfly::Resource[$socket_group_resource]
   }
 
-  $jgroups_multicast = '{jboss.default.multicast.address:230.0.0.4}'
   wildfly::resource { "${socket_group_resource}/socket-binding=jgroups-mping" :
     content => {
       'port'              => 0,
       'interface'         => 'private',
       'multicast-address' => {
-        'EXPRESSION_VALUE' => "$${jgroups_multicast}"
+        'EXPRESSION_VALUE' => '${jboss.default.multicast.address:230.0.0.4}'
       },
       'multicast-port'    => $custom_sockets['jgroups-mping-multicast']
     },
@@ -183,12 +182,11 @@ class profiles::eap_dc(){
     require => Wildfly::Resource[$socket_group_resource]
   }
 
-  $modcluster_multicast = '{jboss.modcluster.multicast.address:224.0.1.105}'
   wildfly::resource { "${socket_group_resource}/socket-binding=modcluster" :
     content => {
       'port'              => 0,
       'multicast-address' => {
-        'EXPRESSION_VALUE' => "$${modcluster_multicast}"
+        'EXPRESSION_VALUE' => '${jboss.modcluster.multicast.address:224.0.1.105}'
       },
       'multicast-port'    => $custom_sockets['modcluster-multicast']
     },
@@ -467,39 +465,17 @@ class profiles::eap_dc(){
         'min-pool-size'                       => 1,
         'max-pool-size'                       => 50,
         'xa-datasource-properties'            => {
-          'User'                => {
-            value => $db2_config['username']
-          },
-          'Password'            => {
-            value => $db2_config['password']
-          },
-          'ServerName'          => {
-            value => $db2_config['hostname']
-          },
-          'PortNumber'          => {
-            value => $db2_config['port']
-          },
-          'DriverType'          => {
-            value => 4
-          },
-          'DatabaseName'        => {
-            value => $db2_config['database']
-          },
-          'currentPackageSet'   => {
-            value => 'SYST'
-          },
-          'currentSchema'       => {
-            value => 'SYST'
-          },
-          'securityMechanism'   => {
-            value => 3
-          },
-          'maxStatements'       => {
-            value => 500
-          },
-          'currentFunctionPath' => {
-            value => 'SYST'
-          }
+          'User'                => { value => $db2_config['username'] },
+          'Password'            => { value => $db2_config['password'] },
+          'ServerName'          => { value => $db2_config['hostname'] },
+          'PortNumber'          => { value => $db2_config['port'] },
+          'DriverType'          => { value => 4 },
+          'DatabaseName'        => { value => $db2_config['database'] },
+          'currentPackageSet'   => { value => 'SYST' },
+          'currentSchema'       => { value => 'SYST' },
+          'securityMechanism'   => { value => 3 },
+          'maxStatements'       => { value => 500 },
+          'currentFunctionPath' => { value => 'SYST' }
         }
       },
       require        => Wildfly::Datasources::Driver['ibmdb2']
@@ -535,27 +511,37 @@ class profiles::eap_dc(){
     }
 
     wildfly::resource { "${mq_connection_definition}/config-properties=transportType" :
-      content => { 'value' => 'CLIENT' },
+      content => {
+        'value' => 'CLIENT'
+      },
       require => Wildfly::Resource[$mq_connection_definition]
     }
 
     wildfly::resource { "${mq_connection_definition}/config-properties=username" :
-      content => { 'value' => $mq_config['username'] },
+      content => {
+        'value' => $mq_config['username']
+      },
       require => Wildfly::Resource[$mq_connection_definition]
     }
 
     wildfly::resource { "${mq_connection_definition}/config-properties=hostName" :
-      content => { 'value' => $mq_config['hostname'] },
+      content => {
+        'value' => $mq_config['hostname']
+      },
       require => Wildfly::Resource[$mq_connection_definition]
     }
 
     wildfly::resource { "${mq_connection_definition}/config-properties=port" :
-      content => { 'value' => $mq_config['port'] },
+      content => {
+        'value' => $mq_config['port']
+      },
       require => Wildfly::Resource[$mq_connection_definition]
     }
 
     wildfly::resource { "${mq_connection_definition}/config-properties=queueManager" :
-      content => { 'value' => $mq_config['queuemanager'] },
+      content => {
+        'value' => $mq_config['queuemanager']
+      },
       require => Wildfly::Resource[$mq_connection_definition]
     }
 
