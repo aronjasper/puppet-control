@@ -31,8 +31,8 @@ wildfly::customisations::mqconfig:
   queuemanager: TEST
 
 wildfly::customisations::remote_ejb_hosts:
-  - 192.168.99.4
-  - 192.168.99.4
+  - 192.168.99.12
+  - 192.168.99.12
 
 # For documentation purposes only.
 # wildfly::customisations::socket-bindings:
@@ -52,7 +52,7 @@ wildfly::customisations::remote_ejb_hosts:
 
 
 # wildfly::mod_cluster_config:
-#   '/profile=full-ha/subsystem=modcluster/mod-cluster-config=configuration':
+#   '/profile=lr-frontend-full-ha/subsystem=modcluster/mod-cluster-config=configuration':
 #     'recursive': true
 #     content:
 #         'advertise-security-key': secret
