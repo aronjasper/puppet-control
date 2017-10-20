@@ -465,17 +465,39 @@ class profiles::eap_dc(){
         'min-pool-size'                       => 1,
         'max-pool-size'                       => 50,
         'xa-datasource-properties'            => {
-          'User'                => { value => $db2_config['username'] },
-          'Password'            => { value => $db2_config['password'] },
-          'ServerName'          => { value => $db2_config['hostname'] },
-          'PortNumber'          => { value => $db2_config['port'] },
-          'DriverType'          => { value => 4 },
-          'DatabaseName'        => { value => $db2_config['database'] },
-          'currentPackageSet'   => { value => 'SYST' },
-          'currentSchema'       => { value => 'SYST' },
-          'securityMechanism'   => { value => 3 },
-          'maxStatements'       => { value => 500 },
-          'currentFunctionPath' => { value => 'SYST' }
+          'User'                => {
+            value => $db2_config['username']
+          },
+          'Password'            => {
+            value => $db2_config['password']
+          },
+          'ServerName'          => {
+            value => $db2_config['hostname']
+          },
+          'PortNumber'          => {
+            value => $db2_config['port']
+          },
+          'DriverType'          => {
+            value => 4
+          },
+          'DatabaseName'        => {
+            value => $db2_config['database']
+          },
+          'currentPackageSet'   => {
+            value => 'SYST'
+          },
+          'currentSchema'       => {
+            value => 'SYST'
+          },
+          'securityMechanism'   => {
+            value => 3
+          },
+          'maxStatements'       => {
+            value => 500
+          },
+          'currentFunctionPath' => {
+            value => 'SYST'
+          }
         }
       },
       require        => Wildfly::Datasources::Driver['ibmdb2']
