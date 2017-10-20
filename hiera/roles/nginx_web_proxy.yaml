@@ -8,6 +8,9 @@ webproxy::resolver: 8.8.8.8
 classes:
   - nginx
   - files
+nginx:
+  serer_tokens: 'off'
+
 
 nginx::nginx_vhosts:
   'rev_proxy':
@@ -38,6 +41,9 @@ nginx::nginx_vhosts:
       ssl_session_tickets: 'off'
       ssl_ecdh_curve: 'secp384r1'
       ssl_session_cache: 'shared:SSL:10m'
+    raw_append:
+      - 'server_tokens off;'
+
 
 # Iinstall test cert,key & dhparams files- intended to be superseeded in live use
 files::files:
