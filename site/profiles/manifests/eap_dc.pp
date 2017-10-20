@@ -260,6 +260,14 @@ class profiles::eap_dc(){
   ############################### SERVER GROUPS ################################
   ##############################################################################
 
+  wildfly::resource { '/server-group=frontend-loadbalancer' :
+    content => {
+      'profile'              => 'load-balancer',
+      'socket-binding-group' => 'load-balancer-sockets'
+    },
+    require => Class['Wildfly']
+  }
+
   wildfly::resource { '/server-group=frontend-web' :
     content => {
       'profile'              => $profiles['frontend'],
