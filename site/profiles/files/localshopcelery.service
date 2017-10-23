@@ -1,0 +1,19 @@
+[Unit]
+Description = localshop celery worker
+After = network.target
+
+[Service]
+PermissionsStartOnly = true
+PIDFile = /run/localshopcelery/celery.pid
+User = localshop
+Group = localshop
+WorkingDirectory = /home/.localshop
+ExecStartPre = /bin/mkdir /run/localshopcelery
+ExecStartPre = /bin/chown -R localshop:localshop /run/localshopcelery
+ExecStart =  /usr/bin/localshop celery worker -B -E
+ExecReload = /bin/kill -s HUP $MAINPID
+ExecStop = /bin/kill -s TERM $MAINPID
+ExecStopPost = /bin/rm -rf /run/localshopcelery
+
+[Install]
+WantedBy = multi-user.target

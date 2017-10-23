@@ -1,0 +1,3 @@
+
+SECRET_KEY = '108f7b9b-0211-412a-bfae-32132df5651e'
+DEBUG = True

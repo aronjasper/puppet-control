@@ -1,0 +1,19 @@
+[Unit]
+Description = localshop
+After = network.target
+
+[Service]
+PermissionsStartOnly = true
+PIDFile = /run/localshop/localshop.pid
+User = localshop
+Group = localshop
+WorkingDirectory = /home/.localshop
+ExecStartPre = /bin/mkdir /run/localshop
+ExecStartPre = /bin/chown -R localshop:localshop /run/localshop
+ExecStart = /usr/bin/env gunicorn localshop.wsgi:application -b 0.0.0.0:7000 --pid /run/localshop/loacalshop.pid
+ExecReload = /bin/kill -s HUP $MAINPID
+ExecStop = /bin/kill -s TERM $MAINPID
+ExecStopPost = /bin/rm -rf /run/localshop
+
+[Install]
+WantedBy = multi-user.target
