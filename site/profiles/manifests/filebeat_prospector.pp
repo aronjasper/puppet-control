@@ -1,14 +1,13 @@
-# Class profiles::filebeat
+# Class profiles::filebeat_prospector
 #
-# This class will manage application server installations
+# This class will manage creating configuration for filebeat prospectors
 #
 # Requires:
 # - filebeat
 #
 
 class profiles::filebeat_prospector(
-  # $prospectors=hiera_hash('prospectors'),
-  $prospectors=hiera_lookup('prospectors'),
+  $prospectors=hiera_hash('prospectors'),
 
   ){
   define prospector (
