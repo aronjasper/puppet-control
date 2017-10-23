@@ -8,9 +8,9 @@ class profiles::localshop(
   package { $requirements:
     ensure => present
   } ->
-  package { "localshop":
+  package { 'localshop':
     ensure   => present,
-    provider => "pip"
+    provider => 'pip'
   } ->
   file { '/lib/python2.7/site-packages/localshop/settings.py':
     ensure  => present,
@@ -50,7 +50,7 @@ class profiles::localshop(
   exec { 'run localshop init':
     command   => '/opt/localshopexpect.sh',
     logoutput => true,
-    user      => "localshop",
+    user      => 'localshop',
     creates   => '/home/.localshop/localshop.db',
     require   => Class['postgresql']
   } ->
