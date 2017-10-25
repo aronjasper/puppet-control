@@ -89,6 +89,8 @@ mod 'lrtomcat',                        :git => 'https://github.com/LandRegistry-
                                        :ref => '0.2.4'
 mod 'wildfly',                         :git => 'https://github.com/biemond/biemond-wildfly.git',
                                        :ref => 'v1.2.8'
+mod 'yumlock',                         :git => 'https://github.com/LandRegistry-Ops/puppet-yumlock',
+                                       :ref => '1.0.0'
 mod 'nessus',                          :git => 'https://github.com/adamcrews/puppet-nessus.git',
                                        :ref => 'v0.3.2'
 

@@ -9,4 +9,5 @@ hiera/vagrant-repository.yaml
 hiera/vagrant-broker.yaml
 hiera/vagrant.yaml
 hiera/application_environment/development.yaml
+hiera/hosts/server1.yaml
 Puppetfile.lock
