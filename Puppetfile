@@ -13,7 +13,7 @@ mod 'jfryman/selinux',                 '0.4.0'
 mod 'gradle',                          :git => 'https://github.com/LandRegistry-Ops/puppet-gradle.git',
                                        :ref => '1.1.0'
 mod 'wsgi',                            :git => 'https://github.com/LandRegistry-Ops/puppet-wsgi.git',
-                                       :ref => '1.4.5'
+                                       :ref => '1.4.6'
 mod 'leinaddm/htpasswd',               '0.0.3'
 mod 'maestrodev/wget',                 '1.7.3'
 mod 'pip',                             :git => 'https://github.com/openstack-infra/puppet-pip.git',
@@ -67,14 +67,14 @@ mod 'postgres',                        :git => 'https://github.com/LandRegistry-
 mod 'powerdns',                        :git => 'https://github.com/LandRegistry-Ops/puppet-powerdns.git',
                                        :ref => '0.3.0'
 mod 'security',                        :git => 'https://github.com/LandRegistry-Ops/puppet-security.git',
-                                       :ref => '0.3.10'
+                                       :ref => '0.3.11'
 mod 'ghoneycutt/hosts',                '2.5.0'
 mod 'opendj',                          :git => 'https://github.com/LandRegistry-Ops/puppet-opendj.git',
                                        :ref => 'd5ca4a4fcaddac366b5a2f2fed62269fb2f2f28c'
 mod 'openresty',                       :git => 'https://github.com/LandRegistry-Ops/puppet-openresty.git',
-                                       :ref => 'd65c915d955fb2c631ac1618e93d50999890b01b'
+                                       :ref => '4532daf504883034064bc04b53b5da8747c8b070'
 mod 'static_content',                  :git => 'https://github.com/LandRegistry/puppet-openresty-static-content.git',
-                                       :ref => 'c1ff382d39f0cf8708f306adc03971b7dc36b4c7'
+                                       :ref => 'd786d97596c795afaa69bc653513d2e7dc572753'
 mod 'geoserver',                       :git => 'https://github.com/LandRegistry-Ops/puppet-geoserver.git',
                                        :ref => '1.0.1'
 mod 'mailhog',                         :git => 'https://github.com/LandRegistry-Ops/attachmentgenie-mailhog.git',
@@ -91,7 +91,8 @@ mod 'wildfly',                         :git => 'https://github.com/biemond/biemo
                                        :ref => 'v1.2.8'
 mod 'yumlock',                         :git => 'https://github.com/LandRegistry-Ops/puppet-yumlock',
                                        :ref => '1.0.0'
-
+mod 'nessus',                          :git => 'https://github.com/adamcrews/puppet-nessus.git',
+                                       :ref => 'v0.3.2'
 
 # Dependency modules
 mod 'ceritsc/yum',                           '0.9.8'

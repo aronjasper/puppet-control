@@ -3,16 +3,13 @@ classes:
   - profiles::packages
   - profiles::eap_slave
 
-wildfly::repository_source: 'http://192.168.50.14'
+wildfly::repository_source: 'http://192.168.99.2'
 wildfly::version: '7.1'
-wildfly::install_source: 'http://192.168.50.14/jboss-eap-7.1.0.Alpha.tar.gz'
-wildfly::properties:
-  'jboss.bind.address.management': '192.168.40.52'
-  'jboss.bind.address': '192.168.40.52'
-  'jboss.domain.master.address': '192.168.40.51'
+wildfly::install_source: 'http://192.168.99.2/jboss-eap-7.1.0.Beta.zip'
 wildfly::remote_username: 'slave'
 wildfly::remote_password: 'passw0rd!'
 wildfly::secret_value: 'cGFzc3cwcmQh'
+profiles::eap_slave::dc: 192.168.99.3
 
 packages:
   - java-1.8.0-openjdk-1.8.0.121-0.b13.el7_3
